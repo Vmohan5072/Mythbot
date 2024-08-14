@@ -27,7 +27,7 @@ const TEST_COMMAND = {
 };
 
 const TEST2_COMMAND = {
-  name: 'test2',
+  name: 'testing',
   description: 'Second command',
   type: 1,
   integration_types: [0, 1],
