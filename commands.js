@@ -55,3 +55,5 @@ const CHALLENGE_COMMAND = {
 const ALL_COMMANDS = [TEST_COMMAND, TEST2_COMMAND, CHALLENGE_COMMAND];
 
 InstallGlobalCommands(process.env.APP_ID, ALL_COMMANDS);
+
+//TODO: function to link riotid to discord account 
