@@ -34,6 +34,12 @@ const TEST2_COMMAND = {
   contexts: [0, 1, 2],
 };
 
+const GET_RIOTID = {
+  name: 'register riotid',
+  description: 'link your Riot ID to your Discord profile',
+  type: 
+}
+
 // Command containing options
 const CHALLENGE_COMMAND = {
   name: 'challenge',
