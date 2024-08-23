@@ -38,7 +38,7 @@ const GET_RIOTID = {
   name: 'register riotid',
   description: 'link your Riot ID to your Discord profile',
   type: 
-}
+};
 
 // Command containing options
 const CHALLENGE_COMMAND = {
