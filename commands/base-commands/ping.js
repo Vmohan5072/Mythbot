@@ -5,5 +5,10 @@ export const data = new SlashCommandBuilder()
 	.setDescription('Replies with Pong!');
 
 export async function execute(interaction) {
-	await interaction.reply('Pong!');
+	try {
+	await interaction.reply('Pong!'); }
+	catch (error) {
+		console.error('Error executing ping command:', error);
+        await interaction.reply({ content: 'There was an error executing this command.', ephemeral: true });
+	}
 }

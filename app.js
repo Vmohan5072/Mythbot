@@ -26,8 +26,9 @@ for (const folder of commandFolders) {
 		// Set a new item in the Collection with the key as the command name and the value as the exported module
 		if ('data' in command && 'execute' in command) {
 			client.commands.set(command.data.name, command);
+			console.log(`Registered command: ${command.data.name}`); //checks for each successfully registered command
 		} else {
-			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`); //prints errors for commands if any
 		}
 	}
 }
@@ -43,13 +44,18 @@ client.once(Events.ClientReady, readyClient => {
 
 // Command listener
 client.on(Events.InteractionCreate, async interaction => {
+	console.log('Interaction received:', interaction.commandName); //debugging console
+
 	if (!interaction.isChatInputCommand()) return; // Returns command if it exists
+
 	const command = interaction.client.commands.get(interaction.commandName);
 
 	if (!command) {
 		console.error(`No command matching ${interaction.commandName} was found.`); // Error handling for missing command
 		return;
 	}
+
+	console.log(`Executing command: ${interaction.commandName}`);//debugging console
 
 	try {
 		await command.execute(interaction);
