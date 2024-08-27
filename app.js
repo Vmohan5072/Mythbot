@@ -1,9 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-// Load dotenv and discord.js classes
-import 'dotenv/config';
 import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import config from './config.json' assert { type: 'json' };
 
 // Get __dirname in ES module scope
 const __filename = fileURLToPath(import.meta.url);
@@ -14,7 +13,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.commands = new Collection();
 
-//recognizes the commands folder for commands
+// Recognize the commands folder for commands
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
@@ -33,8 +32,8 @@ for (const folder of commandFolders) {
 	}
 }
 
-// Fetch token from env and log in
-const discToken = process.env.DISCORD_TOKEN;
+// Fetch token from config.json and log in
+const discToken = config.DISCORD_TOKEN;
 client.login(discToken);
 
 // When the client connects, print a success message
@@ -42,13 +41,13 @@ client.once(Events.ClientReady, readyClient => {
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
 
-//Command listener
+// Command listener
 client.on(Events.InteractionCreate, async interaction => {
-	if (!interaction.isChatInputCommand()) return; //returns command if it exists
+	if (!interaction.isChatInputCommand()) return; // Returns command if it exists
 	const command = interaction.client.commands.get(interaction.commandName);
 
 	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`); //error handling for missing command
+		console.error(`No command matching ${interaction.commandName} was found.`); // Error handling for missing command
 		return;
 	}
 
