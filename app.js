@@ -44,11 +44,11 @@ client.once(Events.ClientReady, readyClient => {
 
 //Command listener
 client.on(Events.InteractionCreate, async interaction => {
-	if (!interaction.isChatInputCommand()) return;
+	if (!interaction.isChatInputCommand()) return; //returns command if it exists
 	const command = interaction.client.commands.get(interaction.commandName);
 
 	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
+		console.error(`No command matching ${interaction.commandName} was found.`); //error handling for missing command
 		return;
 	}
 
