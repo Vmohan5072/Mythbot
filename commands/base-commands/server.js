@@ -5,5 +5,5 @@ export const data = new SlashCommandBuilder()
 	.setDescription('Provides information about the server.');
 
 export async function execute(interaction) {
-	await interaction.reply('This server is ${interaction.guild.name} and has ${interaction.guild.memberCount} members.');
+	await interaction.reply(`This server is ${interaction.guild.name} and has ${interaction.guild.memberCount} members.`);
 }
