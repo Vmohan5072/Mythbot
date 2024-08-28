@@ -1,3 +1,4 @@
+//Returns information about the server
 import { SlashCommandBuilder } from '@discordjs/builders';
 
 export const data = new SlashCommandBuilder()

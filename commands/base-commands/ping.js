@@ -1,3 +1,4 @@
+//basic ping command, primairly to test but functionality
 import { SlashCommandBuilder } from '@discordjs/builders';
 
 export const data = new SlashCommandBuilder()
