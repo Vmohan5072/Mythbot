@@ -8,3 +8,8 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
 	await interaction.reply(`This command was run by ${interaction.user.username}, who joined on ${interaction.member.joinedAt}.`);
 }
+
+/*kick(reason) {
+    return this.guild.members.kick(this, reason);
+  }
+*/

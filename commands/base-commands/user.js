@@ -1,4 +1,4 @@
-//return information about user
+//return information about yourself
 import { SlashCommandBuilder } from '@discordjs/builders';
 
 export const data = new SlashCommandBuilder()
