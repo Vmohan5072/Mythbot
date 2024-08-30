@@ -44,7 +44,6 @@ client.once(Events.ClientReady, readyClient => {
 
 // Command listener
 client.on(Events.InteractionCreate, async interaction => {
-	console.log('Interaction received:', interaction.commandName); //debugging console
 
 	if (!interaction.isChatInputCommand()) return; // Returns command if it exists
 
@@ -67,5 +66,4 @@ client.on(Events.InteractionCreate, async interaction => {
 			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 		}
 	}
-	console.log(interaction);
 });

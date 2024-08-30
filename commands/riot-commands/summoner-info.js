@@ -1,7 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { getPuuidByRiotId, getAccIdByPuuid } from '../../API/riot-api.js';
-import fetch from 'node-fetch';
-import config from '../../config.json' assert { type: 'json' };
 
 export const data = new SlashCommandBuilder()
     .setName('summonerinfo')
@@ -12,11 +10,11 @@ export const data = new SlashCommandBuilder()
             .setRequired(true))
     .addStringOption(option =>
         option.setName('tagline')
-            .setDescription('The tag of the player without a hashtag (e.g., NA1, EUW1, EUNE1, etc.)')
+            .setDescription('The tag of the player without a hashtag (NA1, EUW1, EUNE1, etc.)')
             .setRequired(true))
     .addStringOption(option =>
         option.setName('region')
-            .setDescription('The region of the Riot account (e.g., na1, euw1, eune1, etc.)')
+            .setDescription('The region of the Riot account (na1, euw1, eune1, etc.)')
             .setRequired(true));
 
 export async function execute(interaction) {
@@ -29,17 +27,19 @@ export async function execute(interaction) {
         const puuid = await getPuuidByRiotId(username, tagline, region);
 
         // Fetch League of Legends account info using PUUID
-        const response = await getAccIdByPuuid(puuid, region);
-
-        if (!response.ok) {
-            throw new Error(`Failed to fetch summoner data. Status: ${response.status}, Message: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-
+        const summonerInfo  = await getAccIdByPuuid(puuid, region);
+        
         // Respond with basic account information
-        await interaction.reply(`**Summoner Name:** ${username} #${tagline}\n**Summoner Level:** ${data.summonerLevel}\n**Profile Icon ID:** ${data.profileIconId}`);
-    } catch (error) {
+        await interaction.reply(
+            `**Summoner ID:** ${summonerInfo.summId}\n` +
+            `**Account ID:** ${summonerInfo.accountId}\n` +
+            `**PUUID:** ${summonerInfo.puuid}\n` +
+            `**Profile Icon ID:** ${summonerInfo.profileIconId}\n` +
+            `**Revision Date:** ${new Date(summonerInfo.revisionDate).toLocaleString()}\n` +
+            `**Summoner Level:** ${summonerInfo.summonerLevel}`);
+        }
+        
+    catch (error) {
         console.error('Error fetching summoner data:', error);
         await interaction.reply({ content: 'There was an error fetching the account information. Please try again later.', ephemeral: true });
     }
