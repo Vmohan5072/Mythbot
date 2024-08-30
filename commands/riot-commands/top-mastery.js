@@ -31,5 +31,12 @@ export async function execute(interaction) {
     try {
         // get PUUID by Riot ID
         const puuid = await getPuuidByRiotId(username, tagline, region);
+        if (count) {
+            const champMasteryData = await getMasteryListCountByPUUID(puuid, region, champCount);
+        }
+        else if (!count) {
+            const champMasteryData = await getMasteryCountByPUUID(puuid, region);
+        }
+        let responseMessage = `Champion Mastery Data for Summoner: ${username} ${tagline}\n\n`;
     }
 }

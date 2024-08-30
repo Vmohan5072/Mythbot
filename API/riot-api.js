@@ -120,7 +120,7 @@ export async function getMasteryListByPUUID(puuid, region) {
             champMasteryData = entry;
         });
 
-        return rankedData;
+        return champMasteryData;
     } catch (error) {
         console.error('Error fetching mastery list info:', error);
         throw error;
@@ -146,7 +146,7 @@ export async function getMasteryListCountByPUUID(puuid, region, champCount) {
             champMasteryData = entry;
         });
 
-        return rankedData;
+        return champMasteryData;
     } catch (error) {
         console.error('Error fetching limited mastery list info:', error);
         throw error;
