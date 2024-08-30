@@ -36,6 +36,7 @@ export async function getPuuidByRiotId(username, tagLine, region) {
     }
 }
 
+
 // Function to get accountID from PUUID
 export async function getAccIdByPuuid(puuid, region) {
     const riotApiKey = config.RIOT_KEY;
@@ -63,6 +64,7 @@ export async function getAccIdByPuuid(puuid, region) {
         throw error;  
     }
 }
+
 
 // Function to get ranked info from summonerID
 export async function getRankBySummID(summId, region) {
@@ -100,3 +102,53 @@ export async function getRankBySummID(summId, region) {
 }
 
 
+export async function getMasteryListByPUUID(puuid, region) {
+    const riotApiKey = config.RIOT_KEY;
+
+    try {
+        const response = await fetch(`https://${region}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}?api_key=${riotApiKey}`);
+
+        if (!response.ok) { // throw error
+            throw new Error(`Failed to fetch mastery list info. Status: ${response.status}, Message: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        const champMasteryData = {};
+
+        data.forEach(entry => {
+            champMasteryData = entry;
+        });
+
+        return rankedData;
+    } catch (error) {
+        console.error('Error fetching mastery list info:', error);
+        throw error;
+    }
+}
+
+
+
+export async function getMasteryListCountByPUUID(puuid, region, champCount) {
+    const riotApiKey = config.RIOT_KEY;
+    try {
+        const response = await fetch(`https://${region}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top?count=${champCount}&api_key=${riotApiKey}`);
+
+        if (!response.ok) { // throw error
+            throw new Error(`Failed to fetch limited mastery list info. Status: ${response.status}, Message: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        const champMasteryData = {};
+
+        data.forEach(entry => {
+            champMasteryData = entry;
+        });
+
+        return rankedData;
+    } catch (error) {
+        console.error('Error fetching limited mastery list info:', error);
+        throw error;
+    }
+}
