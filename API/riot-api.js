@@ -114,19 +114,18 @@ export async function getMasteryListByPUUID(puuid, region) {
 
         const data = await response.json();
 
-        const champMasteryData = {};
+        const champMasteryData = [];  // Initialize as an array to hold all entries
 
         data.forEach(entry => {
-            champMasteryData = entry;
+            champMasteryData.push(entry);  // Push each entry into the array
         });
 
-        return champMasteryData;
+        return champMasteryData;  // Return the array
     } catch (error) {
         console.error('Error fetching mastery list info:', error);
         throw error;
     }
 }
-
 
 
 export async function getMasteryListCountByPUUID(puuid, region, champCount) {
@@ -140,15 +139,40 @@ export async function getMasteryListCountByPUUID(puuid, region, champCount) {
 
         const data = await response.json();
 
-        const champMasteryData = {};
+        const champMasteryData = [];  // Initialize as an array to hold all entries
 
         data.forEach(entry => {
-            champMasteryData = entry;
+            champMasteryData.push(entry);  // Push each entry into the array
         });
 
-        return champMasteryData;
+        return champMasteryData;  // Return the array
     } catch (error) {
         console.error('Error fetching limited mastery list info:', error);
         throw error;
+    }
+}
+
+export async function getChampionIdToNameMap() {
+    try {
+        // Fetch latest version
+        const versionResponse = await fetch('https://ddragon.leagueoflegends.com/api/versions.json');
+        const versions = await versionResponse.json();
+        const latestVersion = versions[0];
+
+        // Fetch the champion data
+        const championsResponse = await fetch(`https://ddragon.leagueoflegends.com/cdn/${latestVersion}/data/en_US/champion.json`);
+        const championsData = await championsResponse.json();
+
+        // Map champ name to champ ID
+        const championIdToNameMap = {};
+        for (const championKey in championsData.data) {
+            const champion = championsData.data[championKey];
+            championIdToNameMap[champion.key] = champion.name;  // champion.key is the numeric ID in string format
+        }
+
+        return championIdToNameMap;
+    } catch (error) {
+        console.error('Error fetching champion data:', error);
+        return null;
     }
 }
