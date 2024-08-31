@@ -1,39 +1,44 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { getPuuidByRiotId, getAccIdByPuuid, getRankBySummID } from '../../API/riot-api.js';
+import { getProfile } from '../../profileFunctions.js'; // Import getProfile
 
 export const data = new SlashCommandBuilder()
     .setName('rankedinfo')
     .setDescription('Fetches your League of Legends ranks')
     .addStringOption(option =>
         option.setName('username')
-            .setDescription('The Riot username of the player.')
-            .setRequired(true))
+            .setDescription('The Riot username of the player.'))
     .addStringOption(option =>
         option.setName('tagline')
-            .setDescription('The tag of the player without a hashtag (NA1, EUW1, EUNE1, etc.)')
-            .setRequired(true))
+            .setDescription('The tag of the player without a hashtag (NA1, EUW1, EUNE1, etc.)'))
     .addStringOption(option =>
         option.setName('region')
-            .setDescription('The region of the Riot account (na1, euw1, eune1, etc.)')
-            .setRequired(true));
+            .setDescription('The region of the Riot account (na1, euw1, eune1, etc.)'));
 
 export async function execute(interaction) {
-    const username = interaction.options.getString('username');
-    const tagline = interaction.options.getString('tagline');
-    const region = interaction.options.getString('region');
+    let username = interaction.options.getString('username');
+    let tagline = interaction.options.getString('tagline');
+    let region = interaction.options.getString('region');
+
+    // If no details provided, load from saved profile
+    if (!username || !tagline || !region) {
+        const userProfile = getProfile(interaction.user.id);
+        if (userProfile) {
+            username = username || userProfile.username;
+            tagline = tagline || userProfile.tagline;
+            region = region || userProfile.region;
+        } else {
+            await interaction.reply('Please provide your details or set up your profile with /setprofile.');
+            return;
+        }
+    }
 
     try {
-        // Get PUUID by Riot ID
         const puuid = await getPuuidByRiotId(username, tagline, region);
-
-        // Get summId by PUUID
         const accountInfo = await getAccIdByPuuid(puuid, region);
-        const summId = accountInfo.summId;
+        const rankedData = await getRankBySummID(accountInfo.summId, region);        
 
-        // Get ranked data by summoner ID
-        const rankedData = await getRankBySummID(summId, region);        
-
-        // Construct message
+        // Construct message (continue with existing logic)
         let responseMessage = `Ranked Data for Summoner: ${username} ${tagline}\n\n`;
         // Solo ranked information
         if (rankedData.solo) {
@@ -55,10 +60,10 @@ export async function execute(interaction) {
             responseMessage += `**Flex Queue:** Not available`;
         }
 
-        // Send message
         await interaction.reply(responseMessage);
-
-    } catch (error) {
+    } 
+    
+    catch (error) {
         console.error('Error fetching summoner rank data:', error);
         await interaction.reply({ content: 'There was an error fetching the ranked data. Please try again later.', ephemeral: true });
     }

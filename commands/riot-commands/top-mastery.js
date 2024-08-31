@@ -1,32 +1,41 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { getPuuidByRiotId, getMasteryListByPUUID, getMasteryListCountByPUUID, getChampionIdToNameMap } from '../../API/riot-api.js';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { getProfile } from '../../profileFunctions.js'; // Import getProfile
 
 export const data = new SlashCommandBuilder()
     .setName('topmastery')
     .setDescription('Fetches your top champion masteries')
     .addStringOption(option =>
         option.setName('username')
-            .setDescription('The Riot username of the player.')
-            .setRequired(true))
+            .setDescription('The Riot username of the player.'))
     .addStringOption(option =>
         option.setName('tagline')
-            .setDescription('The tag of the player without a hashtag (NA1, EUW1, EUNE1, etc.)')
-            .setRequired(true))
+            .setDescription('The tag of the player without a hashtag (NA1, EUW1, EUNE1, etc.)'))
     .addStringOption(option =>
         option.setName('region')
-            .setDescription('The region of the Riot account (na1, euw1, eune1, etc.)')
-            .setRequired(true))
+            .setDescription('The region of the Riot account (na1, euw1, eune1, etc.)'))
     .addIntegerOption(option =>
         option.setName('count')
-            .setDescription('The top # of champions to display (Optional))')
-            .setRequired(false));
+            .setDescription('The top # of champions to display (Optional))'));
 
 export async function execute(interaction) {
-    const username = interaction.options.getString('username');
-    const tagline = interaction.options.getString('tagline');
-    const region = interaction.options.getString('region');
+    let username = interaction.options.getString('username');
+    let tagline = interaction.options.getString('tagline');
+    let region = interaction.options.getString('region');
     const count = interaction.options.getInteger('count');
+
+    if (!username || !tagline || !region) {
+        const userProfile = getProfile(interaction.user.id);
+        if (userProfile) {
+            username = username || userProfile.username;
+            tagline = tagline || userProfile.tagline;
+            region = region || userProfile.region;
+        } else {
+            await interaction.reply('Please provide your details or set up your profile with /setprofile.');
+            return;
+        }
+    }
 
     try {
         // Get PUUID by Riot ID
@@ -34,7 +43,7 @@ export async function execute(interaction) {
         
         // Populate champion mastery data
         const champMasteryData = count 
-            ? await getMasteryListCountByPUUID(puuid, region, count) 
+            ? await getMasteryListCountByPUUID(puuid, region, count)  
             : await getMasteryListByPUUID(puuid, region);
 
         // Assign champ name to champ id
