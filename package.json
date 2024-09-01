@@ -2,7 +2,7 @@
   "name": "mythbot",
   "private": true,
   "version": "1.0.0",
-  "description": "Discord app",
+  "description": "Discord bot",
   "main": "app.js",
   "type": "module",
   "engines": {
@@ -13,8 +13,7 @@
     "register": "node commands.js",
     "dev": "nodemon app.js"
   },
-  "author": "Shay DeWael",
-  "license": "MIT",
+  "author": "Vignesh Mohan",
   "dependencies": {
     "@discordjs/builders": "^1.8.2",
     "discord-interactions": "^4.0.0",
