@@ -1,13 +1,13 @@
-//node deploy-commands.js to refresh, add, or remove commands
 import { REST, Routes } from 'discord.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import config from './config.json' assert { type: 'json' };
 
-const { APP_ID, DISCORD_TOKEN, GUILD_ID } = config;
+// Use environment variables instead of config.json
+const APP_ID = process.env.APP_ID;
+const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
+const GUILD_ID = process.env.GUILD_ID;
 
-// Get __dirname in ES module scope
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
