@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import fs from 'fs';
+import { setProfile } from '../../profileFunctions.js'; // Import the function to set profile in PostgreSQL
 
 export const data = new SlashCommandBuilder()
     .setName('setprofile')
@@ -23,19 +23,11 @@ export async function execute(interaction) {
     const tagline = interaction.options.getString('tagline');
     const region = interaction.options.getString('region');
 
-    // Load existing profiles
-    let profiles = {};
     try {
-        profiles = JSON.parse(fs.readFileSync('./userProfiles.json', 'utf8'));
+        await setProfile(userId, username, tagline, region);
+        await interaction.reply(`Your profile has been saved: **${username}** ${tagline} (${region})`);
     } catch (error) {
-        console.error('Error reading profiles file:', error);
+        console.error('Error saving profile:', error);
+        await interaction.reply('There was an error saving your profile. Please try again later.');
     }
-
-    // Save or update user profile
-    profiles[userId] = { username, tagline, region };
-
-    // Write/overwrite updated profiles back to the file
-    fs.writeFileSync('./userProfiles.json', JSON.stringify(profiles, null, 2), 'utf8');
-
-    await interaction.reply(`Your profile has been saved: **${username}** ${tagline} (${region})`);
 }
