@@ -3,67 +3,61 @@ import path from 'node:path';
 import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import config from './config.json' assert { type: 'json' };
+import { registerButtonHandler } from './commands/riot-commands/customs.js';
 
-// Get __dirname in ES module scope
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.commands = new Collection();
 
-// Recognize the commands folder for commands
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
-	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-	for (const file of commandFiles) {
-		const filePath = path.join(commandsPath, file);
-		const command = await import(pathToFileURL(filePath).href);  // Use dynamic import for ES modules
-		// Set a new item in the Collection with the key as the command name and the value as the exported module
-		if ('data' in command && 'execute' in command) {
-			client.commands.set(command.data.name, command);
-			console.log(`Registered command: ${command.data.name}`); //checks for each successfully registered command
-		} else {
-			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`); //prints errors for commands if any
-		}
-	}
+    const commandsPath = path.join(foldersPath, folder);
+    const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+    for (const file of commandFiles) {
+        const filePath = path.join(commandsPath, file);
+        const command = await import(pathToFileURL(filePath).href);
+        if ('data' in command && 'execute' in command) {
+            client.commands.set(command.data.name, command);
+            console.log(`Registered command: ${command.data.name}`);
+        } else {
+            console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+        }
+    }
 }
 
-// Fetch token from config.json and log in
+client.once(Events.ClientReady, readyClient => {
+    console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+    registerButtonHandler(client);
+});
+
 const discToken = config.DISCORD_TOKEN;
 client.login(discToken);
 
-// When the client connects, print a success message
-client.once(Events.ClientReady, readyClient => {
-    console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-});
-
-// Command listener
 client.on(Events.InteractionCreate, async interaction => {
+    if (!interaction.isChatInputCommand()) return;
 
-	if (!interaction.isChatInputCommand()) return; // Returns command if it exists
+    const command = interaction.client.commands.get(interaction.commandName);
 
-	const command = interaction.client.commands.get(interaction.commandName);
+    if (!command) {
+        console.error(`No command matching ${interaction.commandName} was found.`);
+        return;
+    }
 
-	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`); // Error handling for missing command
-		return;
-	}
+    console.log(`Executing command: ${interaction.commandName}`);
 
-	console.log(`Executing command: ${interaction.commandName}`);//debugging console
-
-	try {
-		await command.execute(interaction);
-	} catch (error) {
-		console.error(error);
-		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-		} else {
-			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-		}
-	}
+    try {
+        await command.execute(interaction);
+    } catch (error) {
+        console.error(error);
+        if (interaction.replied || interaction.deferred) {
+            await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+        } else {
+            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        }
+    }
 });
