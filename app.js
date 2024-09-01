@@ -2,9 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import config from './config.json' assert { type: 'json' };
 import { registerButtonHandler } from './commands/riot-commands/customs.js';
 
+// Use environment variables instead of config.json
+const discToken = process.env.DISCORD_TOKEN;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -35,7 +36,6 @@ client.once(Events.ClientReady, readyClient => {
     registerButtonHandler(client);
 });
 
-const discToken = config.DISCORD_TOKEN;
 client.login(discToken);
 
 client.on(Events.InteractionCreate, async interaction => {
