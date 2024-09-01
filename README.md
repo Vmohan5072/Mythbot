@@ -34,7 +34,7 @@ Before you begin, ensure you have met the following requirements:
     ```
 
 3. **Configure the bot**:
-    - Create a `config.json` file in the root directory of the project:
+   Create a `config.json` file in the root directory of the project:
       ```json
       {
         "DISCORD_TOKEN": "your-discord-bot-token",
