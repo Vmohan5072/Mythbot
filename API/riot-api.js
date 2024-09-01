@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
-import config from '../config.json' assert { type: 'json' };
+//Pulls from .env
+const riotApiKey = process.env.RIOT_KEY;
 
 // SPLIT DATES (Update these for each new split)
 export const SPLIT_START_DATE = new Date('2024-05-15').getTime() / 1000; // May 15 2024
@@ -7,7 +8,6 @@ export const SPLIT_END_DATE = new Date('2024-09-24').getTime() / 1000;   // Sept
 
 // Function to get puuid from gameName and tagline
 export async function getPuuidByRiotId(username, tagLine, region) {
-    const RIOT_KEY = process.env.RIOT_KEY;
     let puuidRegion;
     if (["na1", "br1", "la1", "la2"].includes(region)) {
         puuidRegion = "americas";
@@ -40,8 +40,6 @@ export async function getPuuidByRiotId(username, tagLine, region) {
 
 // Function to get accountID from PUUID
 export async function getAccIdByPuuid(puuid, region) {
-    const RIOT_KEY = process.env.RIOT_KEY;
-
     try {
         const response = await fetch(`https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${riotApiKey}`);
 
@@ -70,8 +68,6 @@ export async function getAccIdByPuuid(puuid, region) {
 
 // Function to get ranked info from summonerID
 export async function getRankBySummID(summId, region) {
-    const RIOT_KEY = process.env.RIOT_KEY;
-
     try {
         const response = await fetch(`https://${region}.api.riotgames.com/lol/league/v4/entries/by-summoner/${summId}?api_key=${riotApiKey}`);
 
@@ -106,8 +102,6 @@ export async function getRankBySummID(summId, region) {
 
 // Function to get mastery list by PUUID
 export async function getMasteryListByPUUID(puuid, region) {
-    const RIOT_KEY = process.env.RIOT_KEY;
-
     try {
         const response = await fetch(`https://${region}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}?api_key=${riotApiKey}`);
 
@@ -135,7 +129,6 @@ export async function getMasteryListByPUUID(puuid, region) {
 
 // Function to get a limited mastery list by PUUID
 export async function getMasteryListCountByPUUID(puuid, region, champCount) {
-    const RIOT_KEY = process.env.RIOT_KEY;
     try {
         const response = await fetch(`https://${region}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top?count=${champCount}&api_key=${riotApiKey}`);
 
@@ -163,7 +156,6 @@ export async function getMasteryListCountByPUUID(puuid, region, champCount) {
 
 // Function to fetch live game data by summoner ID
 export async function getLiveGameDataBySummonerId(puuid, region) {
-    const RIOT_KEY = process.env.RIOT_KEY;
     try {
         const response = await fetch(`https://${region}.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/${puuid}?api_key=${riotApiKey}`);
         if (response.status === 404) {
@@ -186,7 +178,6 @@ export async function getLiveGameDataBySummonerId(puuid, region) {
 
 // Function to fetch match IDs by time frame (split) limited to recent 5 matches
 export async function getMatchIdsByTimeFrame(puuid, region, startTime = SPLIT_START_DATE, endTime = SPLIT_END_DATE, limit = 5) {
-    const RIOT_KEY = process.env.RIOT_KEY;
     const matchRegion = getMatchRoutingRegion(region);
     let matchIds = [];
     let start = 0;
@@ -209,7 +200,6 @@ export async function getMatchIdsByTimeFrame(puuid, region, startTime = SPLIT_ST
 
 // Function to get match details by match ID
 export async function getMatchDetails(matchId, region) {
-    const RIOT_KEY = process.env.RIOT_KEY;
     const matchRegion = getMatchRoutingRegion(region);
 
     try {

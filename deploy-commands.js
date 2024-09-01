@@ -44,4 +44,4 @@ const rest = new REST().setToken(DISCORD_TOKEN);
     } catch (error) {
         console.error(error);
     }
-})();
+});
