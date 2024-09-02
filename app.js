@@ -78,11 +78,25 @@ console.log("Starting minimal bot setup...");
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
+console.log("Client initialized...");
+
 client.once(Events.ClientReady, () => {
     console.log('Bot is ready!');
 });
 
-client.login(process.env.DISCORD_TOKEN).catch(error => {
+client.on('error', (error) => {
+    console.error('Client encountered an error:', error);
+});
+
+client.on('warn', (warning) => {
+    console.warn('Client warning:', warning);
+});
+
+client.login(process.env.DISCORD_TOKEN).then(() => {
+    console.log("Login successful...");
+}).catch(error => {
     console.error('Login failed:', error);
     process.exit(1);
 });
+
+console.log("Login attempt made...");
