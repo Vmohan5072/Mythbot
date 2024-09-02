@@ -1,5 +1,5 @@
 //Implementation complete but too rate-limited. Will return when production key is obtained.
-/*
+
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { getPuuidByRiotId, getAccIdByPuuid, getLiveGameDataBySummonerId, getChampionSplitWinRate, getSplitWinRate, getChampionIdToNameMap, SPLIT_START_DATE, SPLIT_END_DATE } from '../../API/riot-api.js';
 import { getProfile } from '../../profileFunctions.js';
@@ -91,4 +91,3 @@ export async function execute(interaction) {
         await interaction.reply({ content: `There was an error fetching the live game information: ${error.message}`, ephemeral: true });
     }
 }
-    */
