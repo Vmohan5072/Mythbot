@@ -1,4 +1,4 @@
-/*import fs from 'node:fs';
+import fs from 'node:fs';
 import path from 'node:path';
 import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -70,33 +70,4 @@ client.on(Events.InteractionCreate, async interaction => {
             await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
         }
     }
-}); */
-
-import { Client, Events, GatewayIntentBits } from 'discord.js';
-
-console.log("Starting minimal bot setup...");
-
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-
-console.log("Client initialized...");
-
-client.once(Events.ClientReady, () => {
-    console.log('Bot is ready!');
-});
-
-client.on('error', (error) => {
-    console.error('Client encountered an error:', error);
-});
-
-client.on('warn', (warning) => {
-    console.warn('Client warning:', warning);
-});
-
-client.login(process.env.DISCORD_TOKEN).then(() => {
-    console.log("Login successful...");
-}).catch(error => {
-    console.error('Login failed:', error);
-    process.exit(1);
-});
-
-console.log("Login attempt made...");
+}); 
