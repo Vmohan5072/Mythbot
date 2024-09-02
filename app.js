@@ -4,7 +4,8 @@ import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { registerButtonHandler } from './commands/riot-commands/customs.js';
 
-// Use environment variables instead of config.json
+console.log("Starting the bot...");  // Add this
+
 const discToken = process.env.DISCORD_TOKEN;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,6 +16,8 @@ client.commands = new Collection();
 
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
+
+console.log("Loading commands...");  // Add this
 
 for (const folder of commandFolders) {
     const commandsPath = path.join(foldersPath, folder);
@@ -35,6 +38,8 @@ client.once(Events.ClientReady, readyClient => {
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
     registerButtonHandler(client);
 });
+
+console.log("Logging in...");  // Add this
 
 client.login(discToken);
 
