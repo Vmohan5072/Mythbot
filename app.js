@@ -19,19 +19,24 @@ const commandFolders = fs.readdirSync(foldersPath);
 
 console.log("Loading commands...");  // Add this
 
-for (const folder of commandFolders) {
-    const commandsPath = path.join(foldersPath, folder);
-    const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-    for (const file of commandFiles) {
-        const filePath = path.join(commandsPath, file);
-        const command = await import(pathToFileURL(filePath).href);
-        if ('data' in command && 'execute' in command) {
-            client.commands.set(command.data.name, command);
-            console.log(`Registered command: ${command.data.name}`);
-        } else {
-            console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+try {
+    for (const folder of commandFolders) {
+        const commandsPath = path.join(foldersPath, folder);
+        const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+        for (const file of commandFiles) {
+            const filePath = path.join(commandsPath, file);
+            const command = await import(pathToFileURL(filePath).href);
+            if ('data' in command && 'execute' in command) {
+                client.commands.set(command.data.name, command);
+                console.log(`Registered command: ${command.data.name}`);
+            } else {
+                console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+            }
         }
     }
+} catch (error) {
+    console.error('Error loading commands:', error);
+    process.exit(1); // Exit the process if command loading fails
 }
 
 client.once(Events.ClientReady, readyClient => {
