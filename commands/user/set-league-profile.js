@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { setProfile } from '../../profileFunctions.js'; // Import the function to set profile in PostgreSQL
+import { setProfile } from '../../profileFunctions.js'; // Import the setProfile function
 
 export const data = new SlashCommandBuilder()
     .setName('setprofile')
@@ -24,10 +24,11 @@ export async function execute(interaction) {
     const region = interaction.options.getString('region');
 
     try {
+        // Save or update user profile in Postgres
         await setProfile(userId, username, tagline, region);
         await interaction.reply(`Your profile has been saved: **${username}** ${tagline} (${region})`);
     } catch (error) {
-        console.error('Error saving profile:', error);
+        console.error('Error setting profile:', error);
         await interaction.reply('There was an error saving your profile. Please try again later.');
     }
 }

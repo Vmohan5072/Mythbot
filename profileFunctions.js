@@ -9,8 +9,14 @@ const client = new Client({
     }
 });
 
-client.connect();
-
+// Try to connect and catch connection errors
+try {
+    await client.connect();
+    console.log('Database connection successful');
+} catch (error) {
+    console.error('Error connecting to the database:', error);
+    process.exit(1); // Exit the process with errors if the database connection fails
+}
 // Get profile by Discord ID
 export async function getProfile(discordId) {
     try {

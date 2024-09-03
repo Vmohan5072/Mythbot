@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { getProfile } from '../../profileFunctions.js'; // Import the function to get profile from PostgreSQL
+import { getProfile } from '../../profileFunctions.js'; // Import the getProfile function
 
 export const data = new SlashCommandBuilder()
     .setName('getprofile')
