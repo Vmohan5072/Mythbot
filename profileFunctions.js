@@ -9,14 +9,17 @@ const client = new Client({
     }
 });
 
-// Try to connect and catch connection errors
-try {
-    await client.connect();
-    console.log('Database connection successful');
-} catch (error) {
-    console.error('Error connecting to the database:', error);
-    process.exit(1); // Exit the process with errors if the database connection fails
+// Function to connect to the database
+export async function connectToDatabase() {
+    try {
+        await client.connect();
+        console.log('Database connection successful');
+    } catch (error) {
+        console.error('Error connecting to the database:', error);
+        process.exit(1); // Exit the process with errors if the database connection fails
+    }
 }
+
 // Get profile by Discord ID
 export async function getProfile(discordId) {
     try {
@@ -47,3 +50,5 @@ export async function setProfile(discordId, username, tagline, region) {
 export function closeConnection() {
     client.end();
 }
+
+connectToDatabase();

@@ -22,9 +22,10 @@ export async function execute(interaction) {
     let username = interaction.options.getString('username');
     let tagline = interaction.options.getString('tagline');
     let region = interaction.options.getString('region');
+    
     // If string fields empty, check for user profile
     if (!username || !tagline || !region) {
-        const userProfile = getProfile(interaction.user.id);
+        const userProfile = await getProfile(interaction.user.id);
         if (userProfile) {
             username = username || userProfile.username;
             tagline = tagline || userProfile.tagline;
@@ -33,6 +34,11 @@ export async function execute(interaction) {
             await interaction.reply({ content: 'Please provide your details or set up your profile with /setprofile.', ephemeral: true });
             return;
         }
+    }
+
+    if (!region) {
+        await interaction.reply({ content: 'Region is required. Please provide your region or set it up in your profile.', ephemeral: true });
+        return;
     }
 
     try {
