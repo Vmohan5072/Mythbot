@@ -21,7 +21,7 @@ export async function getPuuidByRiotId(username, tagLine, region) {
 
     try {
         const response = await fetch(`https://${puuidRegion}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(username)}/${encodeURIComponent(tagLine)}?api_key=${riotApiKey}`);
-
+        console.log (`https://${puuidRegion}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(username)}/${encodeURIComponent(tagLine)}?api_key=${riotApiKey}`)
         if (!response.ok) {
             if (response.status === 429) {
                 await handleRateLimit(response);
