@@ -65,14 +65,15 @@ export async function execute(interaction) {
 
         // Populate top champion template with champion info
         topChampions.forEach((champion, index) => {
-            const championName = championIdToNameMap[champion.championId];
-            const championIconUrl = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${champion.championId}.png`;
+            const championName = championIdToNameMap[champion.championId] || 'Unknown Champion'; // Handle case when champion name is not available
+            const championPoints = champion.championPoints || 'N/A'; // Handle case when champion points are not available
+            const championLevel = champion.championLevel || 'N/A'; // Handle case when champion level is not available
 
             embed.addFields(
                 { 
-                    name: `${index + 1}. ${championName}`, 
-                    value: `Level: ${champion.championLevel}\nPoints: ${champion.championPoints}`, 
-                    inline: true 
+                    name: `${index + 1}. ${championName}`,
+                    value: `Level: ${championLevel}\nPoints: ${championPoints}`,
+                    inline: true
                 }
             );
         });
