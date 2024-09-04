@@ -26,8 +26,10 @@ export async function execute(interaction) {
     // If string fields empty, check for user profile
     if (!username || !tagline || !region) {
         const userProfile = await getProfile(interaction.user.id);
+        console.log('User profile fetched:', userProfile); //more temp logging
+
         if (userProfile) {
-            username = username || userProfile.username;
+            username = username || userProfile.riot_username;
             tagline = tagline || userProfile.tagline;
             region = region || userProfile.region;
         } else {
@@ -40,7 +42,7 @@ export async function execute(interaction) {
         await interaction.reply({ content: 'Region is required. Please provide your region or set it up in your profile.', ephemeral: true });
         return;
     }
-
+    console.log(`Fetching PUUID for username: ${username}, tagline: ${tagline}, region: ${region}`);
     try {
         const puuid = await getPuuidByRiotId(username, tagline, region);
         const summonerInfo = await getAccIdByPuuid(puuid, region);
@@ -76,7 +78,6 @@ export async function execute(interaction) {
         });
 
         embed.setTimestamp();
-
         await interaction.reply({ embeds: [embed] });
     } catch (error) {
         console.error('Error fetching summoner data:', error);

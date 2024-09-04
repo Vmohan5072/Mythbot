@@ -24,6 +24,7 @@ export async function connectToDatabase() {
 export async function getProfile(discordId) {
     try {
         const res = await client.query('SELECT * FROM riot_profiles WHERE discord_id = $1', [discordId]);
+        console.log('Fetched profile:', res.rows[0]);  // Temp logging
         return res.rows[0] || null;
     } catch (error) {
         console.error('Error fetching profile:', error);
