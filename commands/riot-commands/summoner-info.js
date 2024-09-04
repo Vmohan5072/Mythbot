@@ -60,7 +60,7 @@ export async function execute(interaction) {
                 { name: 'Flex Queue', value: rankedData.flex ? `Tier: ${rankedData.flex.tier} ${rankedData.flex.rank} - ${rankedData.flex.leaguePoints} LP\n${rankedData.flex.wins}W ${rankedData.flex.losses}L` : 'Not available', inline: true }
             )
             .addFields(
-                { name: 'Top 3 Champions', value: '\u200B', inline: false }, // Placeholder for top champions
+                { name: 'Top 3 Champions', value: '', inline: false }
             );
 
         // Populate top champion template with champion info
