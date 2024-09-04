@@ -26,7 +26,7 @@ export async function execute(interaction) {
     // If string fields empty, check for user profile
     if (!username || !tagline || !region) {
         const userProfile = await getProfile(interaction.user.id);
-        console.log('User profile fetched:', userProfile); //more temp logging
+        console.log('User profile fetched:', userProfile); // More temp logging
 
         if (userProfile) {
             username = username || userProfile.riot_username;
@@ -42,9 +42,14 @@ export async function execute(interaction) {
         await interaction.reply({ content: 'Region is required. Please provide your region or set it up in your profile.', ephemeral: true });
         return;
     }
+
     console.log(`Fetching PUUID for username: ${username}, tagline: ${tagline}, region: ${region}`);
     try {
         const puuid = await getPuuidByRiotId(username, tagline, region);
+        if (!puuid) {
+            throw new Error(`PUUID not found for username: ${username}, tagline: ${tagline}, region: ${region}`);
+        }
+
         const summonerInfo = await getAccIdByPuuid(puuid, region);
         const rankedData = await getRankBySummID(summonerInfo.summId, region);
         const topChampions = await getMasteryListCountByPUUID(puuid, region, 3);
@@ -60,14 +65,14 @@ export async function execute(interaction) {
                 { name: 'Flex Queue', value: rankedData.flex ? `Tier: ${rankedData.flex.tier} ${rankedData.flex.rank} - ${rankedData.flex.leaguePoints} LP\n${rankedData.flex.wins}W ${rankedData.flex.losses}L` : 'Not available', inline: true }
             )
             .addFields(
-                { name: 'Top 3 Champions', value: '', inline: false }
+                { name: 'Top 3 Champions', value: topChampions.length ? '\u200B' : 'N/A', inline: false } // Handling empty champ list
             );
 
         // Populate top champion template with champion info
         topChampions.forEach((champion, index) => {
-            const championName = championIdToNameMap[champion.championId] || 'Unknown Champion'; // Handle case when champion name is not available
-            const championPoints = champion.championPoints || 'N/A'; // Handle case when champion points are not available
-            const championLevel = champion.championLevel || 'N/A'; // Handle case when champion level is not available
+            const championName = championIdToNameMap[champion.championId] || 'Unknown Champion';
+            const championPoints = champion.championPoints || 'N/A';
+            const championLevel = champion.championLevel || 'N/A';
 
             embed.addFields(
                 { 
