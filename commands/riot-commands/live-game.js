@@ -30,7 +30,9 @@ export async function execute(interaction) {
             username = username || userProfile.riot_username;
             tagline = tagline || userProfile.tagline;
             region = region || userProfile.region;
-        } else {
+        } 
+        
+        else {
             await interaction.reply({ content: 'Please provide your Riot ID details or set up your profile with /setprofile.', ephemeral: true });
             return;
         }
@@ -86,7 +88,7 @@ export async function execute(interaction) {
                 const masteryData = await getMasteryListByPUUID(participant.puuid, region);
                 const masteryPoints = masteryData.find(m => m.championId === participant.championId)?.championPoints || 0;
 
-                columnText += `**${participant.riotId}**\nChampion: ${championName}\nRank: ${soloRank}\nMastery Points: ${masteryPoints.toLocaleString()}\n\n`;
+                columnText += `**${participant.riotId}**\n${championName}\nRank: ${soloRank}\nMastery Points: ${masteryPoints.toLocaleString()}\n\n`;
             }
             return columnText;
         };
@@ -100,12 +102,16 @@ export async function execute(interaction) {
         );
 
         await interaction.reply({ embeds: [embed] });
-    } catch (error) {
+    } 
+    
+    catch (error) {
         console.error('Error fetching live game data:', error);
 
         if (error.message.includes('404')) {
             await interaction.reply({ content: `Could not find a player with the username: ${username} and tagline: ${tagline} in the ${region.toUpperCase()} region. Please make sure the details are correct.`, ephemeral: true });
-        } else {
+        } 
+        
+        else {
             await interaction.reply({ content: 'There was an error fetching the live game data. Please try again later.', ephemeral: true });
         }
     }
