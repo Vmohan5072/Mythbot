@@ -1,4 +1,3 @@
-//Deployment script
 import { REST, Routes } from 'discord.js';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -33,6 +32,24 @@ const rest = new REST().setToken(DISCORD_TOKEN);
 
 (async () => {
     try {
+        console.log(`Started deleting all application (/) commands.`);
+
+        // Fetch all commands for the specific guild
+        const guildCommands = await rest.get(
+            Routes.applicationGuildCommands(APP_ID, GUILD_ID)
+        );
+
+        // Delete all existing commands
+        for (const command of guildCommands) {
+            console.log(`Deleting command: ${command.name} (${command.id})`);
+            await rest.delete(
+                Routes.applicationGuildCommand(APP_ID, GUILD_ID, command.id)
+            );
+        }
+
+        console.log(`Successfully deleted all application (/) commands.`);
+
+        // Now deploy the new set of commands
         console.log(`Started refreshing ${commands.length} application (/) commands.`);
 
         const data = await rest.put(
@@ -42,6 +59,6 @@ const rest = new REST().setToken(DISCORD_TOKEN);
 
         console.log(`Successfully reloaded ${data.length} application (/) commands.`);
     } catch (error) {
-        console.error(error);
+        console.error('Error during command refresh:', error);
     }
-});
+})();
