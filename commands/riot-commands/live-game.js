@@ -60,6 +60,11 @@ export async function execute(interaction) {
             return;
         }
 
+        // Split players into red and blue team
+        const playerTeam = liveGameData.participants.find(p => p.puuid === puuid).teamId; //locate the team that has the searched name
+        const playerTeamData = liveGameData.participants.filter(p => p.teamId === playerTeam);
+        const opposingTeamData = liveGameData.participants.filter(p => p.teamId !== playerTeam); //Assign the team without searched name to opposing team
+
         // Build and send the embed for live game data
         const embed = new EmbedBuilder()
             .setColor('#0099ff')
@@ -67,20 +72,24 @@ export async function execute(interaction) {
             .setDescription('Here is the current live game information.')
             .setTimestamp();
 
-        // Add fields based on live game data for each player in the match
-        liveGameData.participants.forEach((participant, index) => {
+        // Left column is player's team
+        let leftColumn = '**Your Team:**\n';
+        playerTeamData.forEach((participant, index) => {
             const championName = championIdToNameMap[participant.championId] || 'Unknown Champion';
-            const team = participant.teamId === 100 ? 'Blue' : 'Red';
-            const summonerIconUrl = `https://ddragon.leagueoflegends.com/cdn/12.5.1/img/profileicon/${participant.profileIconId}.png`;
-            
-            embed.addFields({
-                name: `Player ${index + 1}: ${participant.riotId}`,
-                value: `Champion: ${championName}, Team: ${team}, Summoner Spells: ${participant.spell1Id}, ${participant.spell2Id}`,
-                inline: true,
-            });
-
-            embed.setThumbnail(summonerIconUrl);
+            leftColumn += `**Player ${index + 1}: ${participant.riotId}**\nChampion: ${championName}\nSummoner Spells: ${participant.spell1Id}, ${participant.spell2Id}\n\n`;
         });
+
+        // Right column is enemy team
+        let rightColumn = '**Opposing Team:**\n';
+        opposingTeamData.forEach((participant, index) => {
+            const championName = championIdToNameMap[participant.championId] || 'Unknown Champion';
+            rightColumn += `**Player ${index + 1}: ${participant.riotId}**\nChampion: ${championName}\nSummoner Spells: ${participant.spell1Id}, ${participant.spell2Id}\n\n`;
+        });
+
+        embed.addFields(
+            { name: 'Your Team', value: leftColumn, inline: true },
+            { name: 'Opposing Team', value: rightColumn, inline: true }
+        );
 
         await interaction.reply({ embeds: [embed] });
     } catch (error) {
