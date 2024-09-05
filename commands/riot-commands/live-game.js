@@ -61,9 +61,9 @@ export async function execute(interaction) {
         }
 
         // Split players into red and blue team
-        const playerTeam = liveGameData.participants.find(p => p.puuid === puuid).teamId; //locate the team that has the searched name
+        const playerTeam = liveGameData.participants.find(p => p.puuid === puuid).teamId; // Locate the team that has the searched name
         const playerTeamData = liveGameData.participants.filter(p => p.teamId === playerTeam);
-        const opposingTeamData = liveGameData.participants.filter(p => p.teamId !== playerTeam); //Assign the team without searched name to opposing team
+        const opposingTeamData = liveGameData.participants.filter(p => p.teamId !== playerTeam); // Assign the team without the searched name to opposing team
 
         // Build and send the embed for live game data
         const embed = new EmbedBuilder()
@@ -73,17 +73,17 @@ export async function execute(interaction) {
             .setTimestamp();
 
         // Left column is player's team
-        let leftColumn = '**Your Team:**\n';
-        playerTeamData.forEach((participant, index) => {
+        let leftColumn = '';
+        playerTeamData.forEach(participant => {
             const championName = championIdToNameMap[participant.championId] || 'Unknown Champion';
-            leftColumn += `**Player ${index + 1}: ${participant.riotId}**\nChampion: ${championName}\nSummoner Spells: ${participant.spell1Id}, ${participant.spell2Id}\n\n`;
+            leftColumn += `**${participant.riotId}**\nChampion: ${championName}\n\n`;
         });
 
         // Right column is enemy team
-        let rightColumn = '**Opposing Team:**\n';
-        opposingTeamData.forEach((participant, index) => {
+        let rightColumn = '';
+        opposingTeamData.forEach(participant => {
             const championName = championIdToNameMap[participant.championId] || 'Unknown Champion';
-            rightColumn += `**Player ${index + 1}: ${participant.riotId}**\nChampion: ${championName}\nSummoner Spells: ${participant.spell1Id}, ${participant.spell2Id}\n\n`;
+            rightColumn += `**${participant.riotId}**\nChampion: ${championName}\n\n`;
         });
 
         embed.addFields(
