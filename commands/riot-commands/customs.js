@@ -53,7 +53,8 @@ export async function execute(interaction) {
     lobbies[lobbyId].messageId = replyMessage.id;
     lobbies[lobbyId].channelId = replyMessage.channel.id;
 }
-// Generate buttons responses
+
+// Generate button responses
 export function registerButtonHandler(client) {
     client.on('interactionCreate', async buttonInteraction => {
         if (!buttonInteraction.isButton()) return;
@@ -130,19 +131,20 @@ async function balanceTeams(lobby, buttonInteraction) {
         // Notify the creator that balancing is in progress, but don't make it ephemeral
         await buttonInteraction.reply({ embeds: [embed], ephemeral: true });
 
-        const region = 'na1'; // Assume NA1
+        const region = 'na1'; // Default region to NA1 if not set
         const playerData = [];
 
         for (const playerId of lobby.players) {
             const user = await buttonInteraction.client.users.fetch(playerId);
-            const riotProfile = getProfile(user.id); // Assume getProfile fetches a linked Riot account
+            const riotProfile = await getProfile(user.id); // Ensure async getProfile
 
             if (!riotProfile) {
+                console.error(`No profile found for player ${user.id}`);
                 continue;
             }
 
-            const { username, tagline } = riotProfile;
-            const puuid = await getPuuidByRiotId(username, tagline, region);
+            const { riot_username, tagline } = riotProfile;
+            const puuid = await getPuuidByRiotId(riot_username, tagline, region);
             const accountInfo = await getAccIdByPuuid(puuid, region);
             const rankData = await getRankBySummID(accountInfo.summId, region);
             const winrateData = await getSplitWinRate(puuid, region);
@@ -181,7 +183,6 @@ async function balanceTeams(lobby, buttonInteraction) {
         await buttonInteraction.followUp({ content: 'There was an error balancing the teams.', ephemeral: true });
     }
 }
-
 
 // Function to convert rank to a set number
 function rankToValue(rank) {
