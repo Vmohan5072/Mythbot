@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { getPuuidByRiotId, getLiveGameDataBySummonerId } from '../../API/riot-api.js';
+import { getPuuidByRiotId, getLiveGameDataBySummonerId, getChampionIdToNameMap } from '../../API/riot-api.js';
 import { getProfile } from '../../profileFunctions.js';
 
 export const data = new SlashCommandBuilder()
@@ -30,9 +30,7 @@ export async function execute(interaction) {
             username = username || userProfile.riot_username;
             tagline = tagline || userProfile.tagline;
             region = region || userProfile.region;
-        } 
-        
-        else {
+        } else {
             await interaction.reply({ content: 'Please provide your Riot ID details or set up your profile with /setprofile.', ephemeral: true });
             return;
         }
@@ -55,6 +53,13 @@ export async function execute(interaction) {
             return;
         }
 
+        // Get the champion ID to name map from Data Dragon API
+        const championIdToNameMap = await getChampionIdToNameMap();
+        if (!championIdToNameMap) {
+            await interaction.reply({ content: 'Failed to fetch champion data. Please try again later.', ephemeral: true });
+            return;
+        }
+
         // Build and send the embed for live game data
         const embed = new EmbedBuilder()
             .setColor('#0099ff')
@@ -64,12 +69,17 @@ export async function execute(interaction) {
 
         // Add fields based on live game data for each player in the match
         liveGameData.participants.forEach((participant, index) => {
+            const championName = championIdToNameMap[participant.championId] || 'Unknown Champion';
             const team = participant.teamId === 100 ? 'Blue' : 'Red';
-            embed.addFields({ 
-                name: `Player ${index + 1}: ${participant.summonerName}`, 
-                value: `Champion: ${participant.championName}, Team: ${team}, Summoner Spell 1: ${participant.summonerSpell1}, Summoner Spell 2: ${participant.summonerSpell2}`, 
-                inline: true 
+            const summonerIconUrl = `https://ddragon.leagueoflegends.com/cdn/12.5.1/img/profileicon/${participant.profileIconId}.png`;
+            
+            embed.addFields({
+                name: `Player ${index + 1}: ${participant.riotId}`,
+                value: `Champion: ${championName}, Team: ${team}, Summoner Spells: ${participant.spell1Id}, ${participant.spell2Id}`,
+                inline: true,
             });
+
+            embed.setThumbnail(summonerIconUrl);
         });
 
         await interaction.reply({ embeds: [embed] });

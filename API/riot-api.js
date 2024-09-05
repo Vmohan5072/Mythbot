@@ -195,7 +195,7 @@ export async function getLiveGameDataBySummonerId(puuid, region) {
             throw new Error(`Failed to fetch live game data. Status: ${response.status}, Message: ${response.statusText}`);
         }
         const data = await response.json();
-        return data;
+        return data; // Return data about each user in a match 
     } catch (error) {
         console.error('Error fetching live game data:', error);
         throw error;
