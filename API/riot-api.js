@@ -181,7 +181,7 @@ export async function getMasteryListCountByPUUID(puuid, region, champCount) {
 // Function to fetch live game data by summoner ID
 export async function getLiveGameDataBySummonerId(puuid, region) {
     await rateLimit(); // Call rate limit before proceeding
-
+    console.log(`https://${region}.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/${puuid}?api_key=${riotApiKey}`); //temp logging
     try {
         const response = await fetch(`https://${region}.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/${puuid}?api_key=${riotApiKey}`);
         if (response.status === 404) {

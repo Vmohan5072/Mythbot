@@ -30,7 +30,9 @@ export async function execute(interaction) {
             username = username || userProfile.riot_username;
             tagline = tagline || userProfile.tagline;
             region = region || userProfile.region;
-        } else {
+        } 
+        
+        else {
             await interaction.reply({ content: 'Please provide your Riot ID details or set up your profile with /setprofile.', ephemeral: true });
             return;
         }
