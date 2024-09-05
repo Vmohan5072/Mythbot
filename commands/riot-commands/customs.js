@@ -69,6 +69,13 @@ export function registerButtonHandler(client) {
         }
 
         if (action === 'join') {
+            // Check if the player has a linked Riot account
+            const riotProfile = await getProfile(buttonInteraction.user.id);
+            if (!riotProfile) {
+                await buttonInteraction.reply({ content: 'You do not have a linked Riot account. Please set up your profile with /setprofile before joining.', ephemeral: true });
+                return; // Stop further execution if no Riot account is linked
+            }
+
             if (lobby.players.length >= lobby.maxPlayers) {
                 await buttonInteraction.reply({ content: 'Lobby is full.', ephemeral: true });
                 return;
