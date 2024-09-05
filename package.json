@@ -9,8 +9,8 @@
     "node": ">=18.x"
   },
   "scripts": {
-    "start": "node deploy-commands.js && node app.js",
-    "register": "node commands.js",
+    "start": "node app.js",
+    "register": "node deploy-commands.js",
     "dev": "nodemon app.js"
   },
   "author": "Vignesh Mohan",
