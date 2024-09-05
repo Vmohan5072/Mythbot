@@ -140,26 +140,46 @@ async function balanceTeams(lobby, buttonInteraction) {
 
             if (!riotProfile) {
                 console.error(`No profile found for player ${user.id}`);
-                continue;
+                continue; // Skip if no profile is found for a player
             }
 
             const { riot_username, tagline } = riotProfile;
-            const puuid = await getPuuidByRiotId(riot_username, tagline, region);
-            const accountInfo = await getAccIdByPuuid(puuid, region);
-            const rankData = await getRankBySummID(accountInfo.summId, region);
-            const winrateData = await getSplitWinRate(puuid, region);
+            if (!riot_username || !tagline) {
+                console.error(`Incomplete profile for player ${user.id}: Missing username or tagline.`);
+                continue; // Skip if username or tagline is missing
+            }
 
-            playerData.push({
-                id: playerId,
-                username: user.username,
-                rank: rankData.solo ? `${rankData.solo.tier} ${rankData.solo.rank}` : 'Unranked',
-                rankPoints: rankData.solo ? rankData.solo.leaguePoints : 0,
-                winRate: winrateData.winRate,
-                totalGames: winrateData.totalGames,
-            });
+            try {
+                const puuid = await getPuuidByRiotId(riot_username, tagline, region);
+                const accountInfo = await getAccIdByPuuid(puuid, region);
+                const rankData = await getRankBySummID(accountInfo.summId, region);
+                const winrateData = await getSplitWinRate(puuid, region);
 
-            // Pace API calls to avoid rate limits
-            await new Promise(resolve => setTimeout(resolve, 600));
+                const rank = rankData.solo ? `${rankData.solo.tier} ${rankData.solo.rank}` : 'Unranked';
+                const rankPoints = rankData.solo ? rankData.solo.leaguePoints : 0;
+                const winRate = winrateData.winRate || 'N/A';
+                const totalGames = winrateData.totalGames || 0;
+
+                playerData.push({
+                    id: playerId,
+                    username: user.username,
+                    rank,
+                    rankPoints,
+                    winRate,
+                    totalGames,
+                });
+
+                // Pace API calls over 6 seconds to avoid rate limits
+                await new Promise(resolve => setTimeout(resolve, 600));
+            } catch (error) {
+                console.error(`Error fetching data for player ${riot_username} (${tagline}):`, error);
+                continue; // Skip the player if there's an error fetching their data
+            }
+        }
+
+        if (playerData.length < 2) {
+            await buttonInteraction.followUp({ content: 'Not enough valid players to balance teams.', ephemeral: true });
+            return;
         }
 
         const teams = generateBalancedTeams(playerData);
@@ -170,8 +190,8 @@ async function balanceTeams(lobby, buttonInteraction) {
             .setTitle('Teams Balanced')
             .setDescription('Teams have been balanced based on ranks and winrates.')
             .addFields(
-                { name: 'Team 1', value: team1, inline: true },
-                { name: 'Team 2', value: team2, inline: true }
+                { name: 'Team 1', value: team1 || 'N/A', inline: true },
+                { name: 'Team 2', value: team2 || 'N/A', inline: true }
             )
             .setColor('#00FF00');
 
