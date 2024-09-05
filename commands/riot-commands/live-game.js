@@ -53,11 +53,13 @@ export async function execute(interaction) {
             .setDescription('Here is the current live game information.')
             .setTimestamp();
 
-        // Add fields based on live game data (example structure)
+        // Add fields based on live game data for each player in the match
         liveGameData.participants.forEach((participant, index) => {
+            const team = participant.teamId === 100 ? 'Blue' : 'Red';
             embed.addFields({ 
                 name: `Player ${index + 1}: ${participant.summonerName}`, 
-                value: `Champion: ${participant.championName}, Team: ${participant.teamId === 100 ? 'Blue' : 'Red'}` 
+                value: `Champion: ${participant.championName}, Team: ${team}, Summoner Spell 1: ${participant.summonerSpell1}, Summoner Spell 2: ${participant.summonerSpell2}`, 
+                inline: true 
             });
         });
 
