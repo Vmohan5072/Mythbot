@@ -1,3 +1,4 @@
+// TODO: repair live game command, Make commands global, improve hosting ability
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { getPuuidByRiotId, getLiveGameDataBySummonerId } from '../../API/riot-api.js';
 import { getProfile } from '../../profileFunctions.js';
