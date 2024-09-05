@@ -26,7 +26,7 @@ export async function execute(interaction) {
     if (!username || !tagline || !region) { // If input fields empty, check for league profile
         const userProfile = getProfile(interaction.user.id);
         if (userProfile) {
-            username = username || userProfile.username;
+            username = username || userProfile.riot_username;
             tagline = tagline || userProfile.tagline;
             region = region || userProfile.region;
         } else { // If no profile found, prompt user to retry or make a profile
