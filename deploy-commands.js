@@ -1,9 +1,9 @@
+//Deployment script
 import { REST, Routes } from 'discord.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-// Use environment variables instead of config.json
 const APP_ID = process.env.APP_ID;
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 const GUILD_ID = process.env.GUILD_ID;

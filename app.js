@@ -17,7 +17,7 @@ client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
-console.log("Loading commands...");  // Add this
+console.log("Loading commands...");  // Console logging
 
 try {
     for (const folder of commandFolders) {
@@ -44,7 +44,7 @@ client.once(Events.ClientReady, readyClient => {
     registerButtonHandler(client);
 });
 
-console.log("Logging in...");  // Add this
+console.log("Logging in...");  // More console logging
 
 client.login(discToken);
 

@@ -9,7 +9,7 @@
     "node": ">=18.x"
   },
   "scripts": {
-    "start": "node --trace-warnings app.js",
+    "start": "node deploy-commands.js && node app.js",
     "register": "node commands.js",
     "dev": "nodemon app.js"
   },
