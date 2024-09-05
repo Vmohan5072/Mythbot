@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { getPuuidByRiotId, getLiveGameDataBySummonerId, getChampionIdToNameMap } from '../../API/riot-api.js';
+import { getPuuidByRiotId, getLiveGameDataBySummonerId, getRankBySummID, getMasteryListByPUUID, getChampionIdToNameMap } from '../../API/riot-api.js';
 import { getProfile } from '../../profileFunctions.js';
 
 export const data = new SlashCommandBuilder()
@@ -61,9 +61,9 @@ export async function execute(interaction) {
         }
 
         // Split players into red and blue team
-        const playerTeam = liveGameData.participants.find(p => p.puuid === puuid).teamId; // Locate the team that has the searched name
+        const playerTeam = liveGameData.participants.find(p => p.puuid === puuid).teamId; //locate the team that has the searched name
         const playerTeamData = liveGameData.participants.filter(p => p.teamId === playerTeam);
-        const opposingTeamData = liveGameData.participants.filter(p => p.teamId !== playerTeam); // Assign the team without the searched name to opposing team
+        const opposingTeamData = liveGameData.participants.filter(p => p.teamId !== playerTeam); //Assign the team without searched name to opposing team
 
         // Build and send the embed for live game data
         const embed = new EmbedBuilder()
@@ -72,19 +72,27 @@ export async function execute(interaction) {
             .setDescription('Here is the current live game information.')
             .setTimestamp();
 
-        // Left column is player's team
-        let leftColumn = '';
-        playerTeamData.forEach(participant => {
-            const championName = championIdToNameMap[participant.championId] || 'Unknown Champion';
-            leftColumn += `**${participant.riotId}**\nChampion: ${championName}\n\n`;
-        });
+        // fetch rank and mastery for each player
+        const addPlayerInfo = async (teamData, columnHeader) => {
+            let columnText = `**${columnHeader}:**\n`;
+            for (const participant of teamData) {
+                const championName = championIdToNameMap[participant.championId] || 'Unknown Champion';
+                
+                // Fetch Rank
+                const rankData = await getRankBySummID(participant.summonerId, region);
+                const soloRank = rankData.solo ? `${rankData.solo.tier} ${rankData.solo.rank}` : 'Unranked';
+                
+                // Fetch Champion Mastery
+                const masteryData = await getMasteryListByPUUID(participant.puuid, region);
+                const masteryPoints = masteryData.find(m => m.championId === participant.championId)?.championPoints || 0;
 
-        // Right column is enemy team
-        let rightColumn = '';
-        opposingTeamData.forEach(participant => {
-            const championName = championIdToNameMap[participant.championId] || 'Unknown Champion';
-            rightColumn += `**${participant.riotId}**\nChampion: ${championName}\n\n`;
-        });
+                columnText += `**${participant.riotId}**\nChampion: ${championName}\nRank: ${soloRank}\nMastery Points: ${masteryPoints.toLocaleString()}\n\n`;
+            }
+            return columnText;
+        };
+
+        const leftColumn = await addPlayerInfo(playerTeamData, 'Your Team');
+        const rightColumn = await addPlayerInfo(opposingTeamData, 'Opposing Team');
 
         embed.addFields(
             { name: 'Your Team', value: leftColumn, inline: true },

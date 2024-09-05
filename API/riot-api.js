@@ -63,7 +63,9 @@ export async function getPuuidByRiotId(username, tagLine, region) {
 
         const data = await response.json();
         return data.puuid;
-    } catch (error) {
+    } 
+    
+    catch (error) {
         console.error('Error fetching PUUID:', error);
         throw error;
     }
@@ -93,7 +95,9 @@ export async function getAccIdByPuuid(puuid, region) {
             revisionDate: data.revisionDate,
             summonerLevel: data.summonerLevel
         };  
-    } catch (error) {
+    } 
+    
+    catch (error) {
         console.error('Error fetching account info:', error);
         throw error;
     }
@@ -150,7 +154,9 @@ export async function getMasteryListByPUUID(puuid, region) {
 
         const data = await response.json();
         return data;
-    } catch (error) {
+    } 
+    
+    catch (error) {
         console.error('Error fetching mastery list info:', error);
         throw error;
     }
@@ -172,7 +178,9 @@ export async function getMasteryListCountByPUUID(puuid, region, champCount) {
 
         const data = await response.json();
         return data;
-    } catch (error) {
+    } 
+    
+    catch (error) {
         console.error('Error fetching limited mastery list info:', error);
         throw error;
     }
@@ -196,7 +204,9 @@ export async function getLiveGameDataBySummonerId(puuid, region) {
         }
         const data = await response.json();
         return data; // Return data about each user in a match 
-    } catch (error) {
+    } 
+    
+    catch (error) {
         console.error('Error fetching live game data:', error);
         throw error;
     }
@@ -240,7 +250,9 @@ export async function getMatchDetails(matchId, region) {
             throw new Error(`Failed to fetch match details. Status: ${response.status}, Message: ${response.statusText}`);
         }
         return await response.json();
-    } catch (error) {
+    } 
+    
+    catch (error) {
         console.error('Error fetching match details:', error);
         throw error;
     }
@@ -311,7 +323,9 @@ export async function getChampionIdToNameMap() {
         }
 
         return championIdToNameMap;
-    } catch (error) {
+    } 
+    
+    catch (error) {
         console.error('Error fetching champion data:', error);
         return null;
     }
@@ -323,7 +337,9 @@ async function handleRateLimit(response) {
     if (retryAfter) {
         console.warn(`Rate limited. Retrying after ${retryAfter} seconds.`);
         await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
-    } else {
+    } 
+    
+    else {
         console.warn('Rate limited but no Retry-After header provided. Pausing for 10 seconds.');
         await new Promise(resolve => setTimeout(resolve, 10000));
     }
@@ -333,11 +349,17 @@ async function handleRateLimit(response) {
 function getMatchRoutingRegion(region) {
     if (["na1", "br1", "la1", "la2", "oc1"].includes(region)) {
         return "americas";
-    } else if (["euw1", "eun1", "tr1", "ru"].includes(region)) {
+    } 
+    
+    else if (["euw1", "eun1", "tr1", "ru"].includes(region)) {
         return "europe";
-    } else if (["kr", "jp1"].includes(region)) {
+    } 
+    
+    else if (["kr", "jp1"].includes(region)) {
         return "asia";
-    } else {
+    } 
+    
+    else {
         throw new Error(`Invalid region code: ${region}`);
     }
 }
