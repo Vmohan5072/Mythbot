@@ -1,6 +1,5 @@
-// TODO: repair live game command, Make commands global, improve hosting ability
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { getPuuidByRiotId, getLiveGameDataBySummonerId } from '../../API/riot-api.js';
+import { getPuuidByRiotId, getLiveGameDataBySummonerId, getSplitWinRate, getMasteryListCountByPUUID } from '../../API/riot-api.js';
 import { getProfile } from '../../profileFunctions.js';
 
 export const data = new SlashCommandBuilder()
@@ -47,22 +46,35 @@ export async function execute(interaction) {
             return;
         }
 
-        // Build and send the embed for live game data
+        // Build the embed for live game data
         const embed = new EmbedBuilder()
             .setColor('#0099ff')
             .setTitle(`Live Game Data for ${username}`)
             .setDescription('Here is the current live game information.')
             .setTimestamp();
 
-        // Add fields based on live game data for each player in the match
-        liveGameData.participants.forEach((participant, index) => {
+        // Iterate over all participants and fetch win rate and mastery points for each player
+        for (const [index, participant] of liveGameData.participants.entries()) {
+            const summonerPuuid = await getPuuidByRiotId(participant.summonerName, tagline, region);
+            
+            // Fetch the win rate for the last 10 games
+            const winRateData = await getSplitWinRate(summonerPuuid, region, 10);
+
+            // Fetch mastery points for the current champion being played
+            const masteryData = await getMasteryListCountByPUUID(summonerPuuid, region, 1);
+            const championMasteryPoints = masteryData.length > 0 ? masteryData[0].championPoints : 'N/A';
+
+            // Set up the player data
             const team = participant.teamId === 100 ? 'Blue' : 'Red';
-            embed.addFields({ 
-                name: `Player ${index + 1}: ${participant.summonerName}`, 
-                value: `Champion: ${participant.championName}, Team: ${team}, Summoner Spell 1: ${participant.summonerSpell1}, Summoner Spell 2: ${participant.summonerSpell2}`, 
-                inline: true 
+            embed.addFields({
+                name: `Player ${index + 1}: ${participant.summonerName}`,
+                value: `Champion: ${participant.championName}, Team: ${team}, Winrate (Last 10 Games): ${winRateData.winRate}%, Mastery Points: ${championMasteryPoints}`,
+                inline: true
             });
-        });
+
+            // Throttle API calls to avoid rate limits (paced over time)
+            await new Promise(resolve => setTimeout(resolve, 600)); // Pace over 600ms per player
+        }
 
         await interaction.reply({ embeds: [embed] });
     } catch (error) {

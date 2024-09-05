@@ -49,7 +49,7 @@ export async function getPuuidByRiotId(username, tagLine, region) {
     } else {
         throw new Error(`Invalid region code: ${region}`);
     }
-    console.log (`https://${puuidRegion}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(username)}/${encodeURIComponent(tagLine)}?api_key=${riotApiKey}`);
+    console.log(`https://${puuidRegion}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(username)}/${encodeURIComponent(tagLine)}?api_key=${riotApiKey}`);
 
     try {
         const response = await fetch(`https://${puuidRegion}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(username)}/${encodeURIComponent(tagLine)}?api_key=${riotApiKey}`);
@@ -149,13 +149,7 @@ export async function getMasteryListByPUUID(puuid, region) {
         }
 
         const data = await response.json();
-
-        const champMasteryData = [];
-        data.forEach(entry => {
-            champMasteryData.push(entry);
-        });
-
-        return champMasteryData;
+        return data;
     } catch (error) {
         console.error('Error fetching mastery list info:', error);
         throw error;
@@ -177,13 +171,7 @@ export async function getMasteryListCountByPUUID(puuid, region, champCount) {
         }
 
         const data = await response.json();
-
-        const champMasteryData = [];
-        data.forEach(entry => {
-            champMasteryData.push(entry);
-        });
-
-        return champMasteryData;
+        return data;
     } catch (error) {
         console.error('Error fetching limited mastery list info:', error);
         throw error;
@@ -259,8 +247,8 @@ export async function getMatchDetails(matchId, region) {
 }
 
 // Function to calculate general win rate over a limited number of matches
-export async function getSplitWinRate(puuid, region, startTime = SPLIT_START_DATE, endTime = SPLIT_END_DATE, matchLimit = 5) {
-    const matchIds = await getMatchIdsByTimeFrame(puuid, region, startTime, endTime, matchLimit);
+export async function getSplitWinRate(puuid, region, matchLimit = 10) {
+    const matchIds = await getMatchIdsByTimeFrame(puuid, region, SPLIT_START_DATE, SPLIT_END_DATE, matchLimit);
     let totalGames = 0;
     let totalWins = 0;
 
@@ -283,8 +271,8 @@ export async function getSplitWinRate(puuid, region, startTime = SPLIT_START_DAT
 }
 
 // Function to calculate champion-specific win rate over a limited number of matches
-export async function getChampionSplitWinRate(puuid, region, championId, startTime = SPLIT_START_DATE, endTime = SPLIT_END_DATE, matchLimit = 5) {
-    const matchIds = await getMatchIdsByTimeFrame(puuid, region, startTime, endTime, matchLimit);
+export async function getChampionSplitWinRate(puuid, region, championId, matchLimit = 10) {
+    const matchIds = await getMatchIdsByTimeFrame(puuid, region, SPLIT_START_DATE, SPLIT_END_DATE, matchLimit);
     let championGames = 0;
     let championWins = 0;
 
