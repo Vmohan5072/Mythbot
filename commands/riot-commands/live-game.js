@@ -78,9 +78,8 @@ export async function execute(interaction) {
             .setTimestamp();
 
         // Add details about the player's team and opponent's team
-        let leftColumn = '**Your Team:**\n';
-        let rightColumn = '**Opposing Team:**\n';
-
+        let leftColumn = '';
+        let rightColumn = '';
         for (const participant of playerTeamData) {
             const championName = championIdToNameMap[participant.championId] || 'Unknown Champion';
             const summId = participant.summonerId;
@@ -89,7 +88,7 @@ export async function execute(interaction) {
             const champMastery = masteryData.find(mastery => mastery.championId === participant.championId)?.championPoints || 'N/A';
             const soloRank = rankData.solo ? `${rankData.solo.tier} ${rankData.solo.rank}` : 'Unranked';
 
-            leftColumn += `**${participant.riotId}**\nChampion: ${championName}\nSolo/Duo Rank: ${soloRank}\nMastery Points: ${champMastery}\n\n`;
+            leftColumn += `**${participant.riotId}**\nSolo/Duo Rank: ${soloRank}\nChampion: ${championName}\nMastery Points: ${champMastery}\n\n`; //Gathers each player's information
         }
 
         for (const participant of opposingTeamData) {
@@ -100,26 +99,27 @@ export async function execute(interaction) {
             const champMastery = masteryData.find(mastery => mastery.championId === participant.championId)?.championPoints || 'N/A';
             const soloRank = rankData.solo ? `${rankData.solo.tier} ${rankData.solo.rank}` : 'Unranked';
 
-            rightColumn += `**${participant.riotId}**\nChampion: ${championName}\nSolo/Duo Rank: ${soloRank}\nMastery Points: ${champMastery}\n\n`;
+            rightColumn += `**${participant.riotId}**\nSolo/Duo Rank: ${soloRank}\nChampion: ${championName}\nMastery Points: ${champMastery}\n\n`; //Gathers each player's information
         }
-
+        
+        //Pastes both teams' information into message
         embed.addFields(
             { name: 'Your Team', value: leftColumn, inline: true },
             { name: 'Opposing Team', value: rightColumn, inline: true }
         );
 
-        // Final reply after processing
+        // Send final message
         await interaction.editReply({ embeds: [embed] });
     } 
     
     catch (error) {
         console.error('Error fetching live game data:', error);
 
-        if (error.message.includes('404')) {
+        if (error.message.includes('404')) { // Account not found
             await interaction.editReply({ content: `Could not find a player with the username: ${username} and tagline: ${tagline} in the ${region.toUpperCase()} region. Please make sure the details are correct.`, ephemeral: true });
         } 
         
-        else {
+        else { // Generic error
             await interaction.editReply({ content: 'There was an error fetching the live game data. Please try again later.', ephemeral: true });
         }
     }
