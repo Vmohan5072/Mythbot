@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { getPuuidByRiotId, getMasteryListByPUUID, getMasteryListCountByPUUID, getChampionIdToNameMap } from '../../API/riot-api.js';
 import { getProfile } from '../../profileFunctions.js'; // Import getProfile
 
@@ -28,10 +28,11 @@ export async function execute(interaction) {
     let region = interaction.options.getString('region');
     const count = interaction.options.getInteger('count');
 
+    // Fetch user profile if no name is provided
     if (!username || !tagline || !region) {
-        const userProfile = getProfile(interaction.user.id);
+        const userProfile = await getProfile(interaction.user.id);
         if (userProfile) {
-            username = username || userProfile.username;
+            username = username || userProfile.riot_username;
             tagline = tagline || userProfile.tagline;
             region = region || userProfile.region;
         } else {
@@ -41,8 +42,9 @@ export async function execute(interaction) {
     }
 
     try {
+        // Fetch PUUID and mastery data
         const puuid = await getPuuidByRiotId(username, tagline, region);
-        const champMasteryData = count //Check if count is provided, otherwise default to showing all champs
+        const champMasteryData = count // Check if count is provided, otherwise default to showing all champs
             ? await getMasteryListCountByPUUID(puuid, region, count)  
             : await getMasteryListByPUUID(puuid, region);
 
@@ -50,6 +52,7 @@ export async function execute(interaction) {
         if (!championIdToNameMap) {
             throw new Error('Failed to fetch champion data.');
         }
+
         // Build message embed
         const embed = new EmbedBuilder()
             .setColor('#4B0082')
@@ -60,12 +63,19 @@ export async function execute(interaction) {
 
         // Adding fields based on mastery data
         champMasteryData.forEach((champion, index) => {
-            if (index < 10) { // Limiting to top 10 for display
-                const championName = championIdToNameMap[champion.championId];
-                embed.addFields({ name: `#${index + 1} ${championName}`, value: `Level: ${champion.championLevel}\nPoints: ${champion.championPoints}`, inline: true });
+            if (index < 10) {
+                const championName = championIdToNameMap[champion.championId] || 'Unknown Champion'; 
+                const championLevel = champion.championLevel || 'N/A'; 
+                const championPoints = champion.championPoints || 'N/A'; 
+                embed.addFields({ 
+                    name: `#${index + 1} ${championName}`, 
+                    value: `Level: ${championLevel}\nPoints: ${championPoints}`, 
+                    inline: true 
+                });
             }
         });
 
+        // Send the reply with the embedded champion mastery data
         await interaction.reply({ embeds: [embed] });
     } catch (error) {
         console.error('Error executing command:', error);
