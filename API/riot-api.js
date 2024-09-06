@@ -258,6 +258,20 @@ export async function getMatchDetails(matchId, region) {
     }
 }
 
+// convert queueid to queue name
+export async function getQueueDescription(queueId) {
+    try {
+        const response = await fetch('https://static.developer.riotgames.com/docs/lol/queues.json');
+        const queueData = await response.json();
+
+        const queue = queueData.find(q => q.queueId === queueId);
+        return queue ? queue.description : 'Unknown Queue';
+    } catch (error) {
+        console.error('Error fetching queue description:', error);
+        return 'Unknown Queue';
+    }
+}
+
 // Function to calculate general win rate over a limited number of matches
 export async function getSplitWinRate(puuid, region, matchLimit = 10) {
     const matchIds = await getMatchIdsByTimeFrame(puuid, region, SPLIT_START_DATE, SPLIT_END_DATE, matchLimit);

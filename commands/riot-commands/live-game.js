@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { getPuuidByRiotId, getLiveGameDataBySummonerId, getRankBySummID, getMasteryListByPUUID, getChampionIdToNameMap } from '../../API/riot-api.js';
+import { getPuuidByRiotId, getLiveGameDataBySummonerId, getRankBySummID, getMasteryListByPUUID, getChampionIdToNameMap, getQueueDescription } from '../../API/riot-api.js';
 import { getProfile } from '../../profileFunctions.js';
 
 export const data = new SlashCommandBuilder()
@@ -69,6 +69,10 @@ export async function execute(interaction) {
             return;
         }
 
+         // grab queue from queueId
+         const queueDescription = await getQueueDescription(liveGameData.gameQueueConfigId);
+
+
         // Get the champion ID to name map from Data Dragon API
         const championIdToNameMap = await getChampionIdToNameMap();
         if (!championIdToNameMap) {
@@ -93,8 +97,8 @@ export async function execute(interaction) {
         const embed = new EmbedBuilder()
             .setColor('#0099ff')
             .setTitle(`Live Game Data for ${username}`)
-            .setDescription(`Game Type: ${gameType}\nGame Mode: ${gameMode}\nQueue Type: ${gameQueueConfigId}\nGame Length: ${gameLengthMinutes}m ${gameLengthSeconds}s`)
-            .setTimestamp();
+            .setDescription(`Queue Type: ${queueDescription}\nGame Length: ${gameLengthMinutes}m ${gameLengthSeconds}s`) //Displays queue type and current length
+            .setTimestamp(); //displays baseline time to compare to game length
 
         // Add details about the player's team and opponent's team
         let leftColumn = '';
