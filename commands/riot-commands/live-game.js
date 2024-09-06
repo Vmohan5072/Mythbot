@@ -1,4 +1,4 @@
-// TODO: Adjust queue type names, Rework region input handling, allow users to ping others to pull their riot info, Create rank and mastery leaderboard command
+// TODO: Adjust queue type names, Create rank and mastery leaderboard command, change command deployment to global, Rework region input handling, allow users to ping others to pull their riot info, adjust readme
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { getPuuidByRiotId, getLiveGameDataBySummonerId, getRankBySummID, getMasteryListByPUUID, getChampionIdToNameMap, getQueueDescription } from '../../API/riot-api.js';
 import { getProfile } from '../../profileFunctions.js';
