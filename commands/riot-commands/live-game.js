@@ -20,7 +20,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) {
     // Defer the reply to avoid interaction timeout
-    await interaction.deferReply({ ephemeral: false });
+    await interaction.deferReply({ ephemeral: true });
 
     let username = interaction.options.getString('username');
     let tagline = interaction.options.getString('tagline');
@@ -33,9 +33,7 @@ export async function execute(interaction) {
             username = username || userProfile.riot_username;
             tagline = tagline || userProfile.tagline;
             region = region || userProfile.region;
-        } 
-        
-        else {
+        } else {
             await interaction.editReply({ content: 'Please provide your Riot ID details or set up your profile with /setprofile.', ephemeral: true });
             return;
         }
@@ -48,11 +46,12 @@ export async function execute(interaction) {
         return regionWithNumber.replace(/\d+$/, '');
     };
 
-    // Create op.gg link for each player in match
-    const constructOpGGUrl = (region, username, tag) => {
+    // Create op.gg link for each player
+    const constructOpGGUrl = (region, riotId) => {
         const formattedRegion = convertRegion(region);
-        const encodedUsername = encodeURIComponent(username);
-        return `https://www.op.gg/summoners/${formattedRegion}/${encodedUsername}-${tag}`;
+        const [riotUsername, riotTag] = riotId.split('#');  // Split riotId into username and tag
+        const encodedUsername = encodeURIComponent(riotUsername);
+        return `https://www.op.gg/summoners/${formattedRegion}/${encodedUsername}-${riotTag}`;
     };
 
     try {
@@ -100,7 +99,7 @@ export async function execute(interaction) {
             const masteryData = await getMasteryListByPUUID(participant.puuid, region);
             const champMastery = masteryData.find(mastery => mastery.championId === participant.championId)?.championPoints || 'N/A';
             const soloRank = rankData.solo ? `${rankData.solo.tier} ${rankData.solo.rank}` : 'Unranked';
-            const opGGUrl = constructOpGGUrl(region, participant.riotId, tagline); //overlays player's op.gg link to username
+            const opGGUrl = constructOpGGUrl(region, participant.riotId);
 
             leftColumn += `**[${participant.riotId}](${opGGUrl})**\nSolo/Duo Rank: ${soloRank}\nChampion: ${championName}\nMastery Points: ${champMastery}\n\n`;
         }
@@ -112,7 +111,7 @@ export async function execute(interaction) {
             const masteryData = await getMasteryListByPUUID(participant.puuid, region);
             const champMastery = masteryData.find(mastery => mastery.championId === participant.championId)?.championPoints || 'N/A';
             const soloRank = rankData.solo ? `${rankData.solo.tier} ${rankData.solo.rank}` : 'Unranked';
-            const opGGUrl = constructOpGGUrl(region, participant.riotId, tagline);
+            const opGGUrl = constructOpGGUrl(region, participant.riotId);
 
             rightColumn += `**[${participant.riotId}](${opGGUrl})**\nSolo/Duo Rank: ${soloRank}\nChampion: ${championName}\nMastery Points: ${champMastery}\n\n`;
         }
