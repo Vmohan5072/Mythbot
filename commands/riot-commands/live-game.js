@@ -43,6 +43,18 @@ export async function execute(interaction) {
 
     console.log(`Fetching live game data for username: ${username}, tagline: ${tagline}, region: ${region}`);
 
+    // Regex conversion function to remove number after region for op.gg link
+    const convertRegion = (regionWithNumber) => {
+        return regionWithNumber.replace(/\d+$/, '');
+    };
+
+    // Create op.gg link for each player in match
+    const constructOpGGUrl = (region, username, tag) => {
+        const formattedRegion = convertRegion(region);
+        const encodedUsername = encodeURIComponent(username);
+        return `https://www.op.gg/summoners/${formattedRegion}/${encodedUsername}-${tag}`;
+    };
+
     try {
         const puuid = await getPuuidByRiotId(username, tagline, region);
 
@@ -80,6 +92,7 @@ export async function execute(interaction) {
         // Add details about the player's team and opponent's team
         let leftColumn = '';
         let rightColumn = '';
+
         for (const participant of playerTeamData) {
             const championName = championIdToNameMap[participant.championId] || 'Unknown Champion';
             const summId = participant.summonerId;
@@ -87,8 +100,9 @@ export async function execute(interaction) {
             const masteryData = await getMasteryListByPUUID(participant.puuid, region);
             const champMastery = masteryData.find(mastery => mastery.championId === participant.championId)?.championPoints || 'N/A';
             const soloRank = rankData.solo ? `${rankData.solo.tier} ${rankData.solo.rank}` : 'Unranked';
+            const opGGUrl = constructOpGGUrl(region, participant.riotId, tagline); //overlays player's op.gg link to username
 
-            leftColumn += `**${participant.riotId}**\nSolo/Duo Rank: ${soloRank}\nChampion: ${championName}\nMastery Points: ${champMastery}\n\n`; //Gathers each player's information
+            leftColumn += `**[${participant.riotId}](${opGGUrl})**\nSolo/Duo Rank: ${soloRank}\nChampion: ${championName}\nMastery Points: ${champMastery}\n\n`;
         }
 
         for (const participant of opposingTeamData) {
@@ -98,28 +112,28 @@ export async function execute(interaction) {
             const masteryData = await getMasteryListByPUUID(participant.puuid, region);
             const champMastery = masteryData.find(mastery => mastery.championId === participant.championId)?.championPoints || 'N/A';
             const soloRank = rankData.solo ? `${rankData.solo.tier} ${rankData.solo.rank}` : 'Unranked';
+            const opGGUrl = constructOpGGUrl(region, participant.riotId, tagline);
 
-            rightColumn += `**${participant.riotId}**\nSolo/Duo Rank: ${soloRank}\nChampion: ${championName}\nMastery Points: ${champMastery}\n\n`; //Gathers each player's information
+            rightColumn += `**[${participant.riotId}](${opGGUrl})**\nSolo/Duo Rank: ${soloRank}\nChampion: ${championName}\nMastery Points: ${champMastery}\n\n`;
         }
-        
-        //Pastes both teams' information into message
+
         embed.addFields(
             { name: 'Your Team', value: leftColumn, inline: true },
             { name: 'Opposing Team', value: rightColumn, inline: true }
         );
 
-        // Send final message
+        // Final reply after processing
         await interaction.editReply({ embeds: [embed] });
     } 
     
     catch (error) {
         console.error('Error fetching live game data:', error);
 
-        if (error.message.includes('404')) { // Account not found
+        if (error.message.includes('404')) {
             await interaction.editReply({ content: `Could not find a player with the username: ${username} and tagline: ${tagline} in the ${region.toUpperCase()} region. Please make sure the details are correct.`, ephemeral: true });
         } 
         
-        else { // Generic error
+        else {
             await interaction.editReply({ content: 'There was an error fetching the live game data. Please try again later.', ephemeral: true });
         }
     }
