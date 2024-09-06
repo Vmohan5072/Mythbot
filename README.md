@@ -7,7 +7,7 @@ MythBot is a Discord bot designed with the Discord.js framework to enhance the L
 - **Custom Lobby Creation**: Users can create custom lobbies within Discord, allowing other users to join and leave with a simple click of a button.
 - **Team Balancing**: The bot balances teams within the lobby based on player ranks and divisions to ensure fair matches.
 - **Profile Fetching**: Retrieve detailed League of Legends profile information, including rank, win rate, and mastery, directly from Discord.
-- **Dynamic User Interaction**: The bot utilizes Discord's interaction components, such as buttons, for joining and leaving lobbies, as well as for balancing teams.
+- **Live Game Data**: During a League of Legends match, the bot can gather information of each player in your match, such as the ranks, current champion mastery, and a linked op.gg profile.
 
 ## Getting Started
 
@@ -78,10 +78,9 @@ Before you begin, ensure you have met the following requirements:
 
 ## API Call Rate Limiting
 
-- **Rate Limits**: The bot paces API calls to the Riot Games API over 6-8 seconds to avoid hitting rate limits.
+- **Rate Limits**: The bot properly paces API calls to the Riot Games API to avoid hitting rate limits.
 - **Error Handling**: The bot handles 429 rate limit errors by retrying the request after the recommended delay.
 
 ## Coming Soon
 
-- **Live Game Data**: During a League of Legends match, the bot can gather information of each player in your match, such as the ranks, average winrate and champion winrates.
-- **Server Leaderboard**: A leaderboard in a server that displays the people with the highest ranks, as well as the top champion masteries.
+- **Server Leaderboard**: A leaderboard in a server that displays the Discord users with the highest ranks, as well as the top champion masteries.
