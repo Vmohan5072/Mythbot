@@ -259,14 +259,20 @@ export async function getMatchDetails(matchId, region) {
 }
 
 // convert queueid to queue name
-export async function getQueueDescription(queueId) {
+async function getQueueDescription(queueId) {
     try {
         const response = await fetch('https://static.developer.riotgames.com/docs/lol/queues.json');
         const queueData = await response.json();
 
         const queue = queueData.find(q => q.queueId === queueId);
-        return queue ? queue.description : 'Unknown Queue';
-    } catch (error) {
+        if (queue) {
+            // Stem response to remove "games" in the end
+            return queue.description ? queue.description.replace(/ games$/i, '') : 'Unknown Queue';
+        }
+        return 'Unknown Queue';
+    }
+    
+    catch (error) {
         console.error('Error fetching queue description:', error);
         return 'Unknown Queue';
     }
