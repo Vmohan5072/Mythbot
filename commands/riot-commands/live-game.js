@@ -20,7 +20,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) {
     // Defer the reply to avoid interaction timeout
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ ephemeral: false });
 
     let username = interaction.options.getString('username');
     let tagline = interaction.options.getString('tagline');
