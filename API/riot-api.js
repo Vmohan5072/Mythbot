@@ -259,7 +259,7 @@ export async function getMatchDetails(matchId, region) {
 }
 
 // convert queueid to queue name
-async function getQueueDescription(queueId) {
+export async function getQueueDescription(queueId) {
     try {
         const response = await fetch('https://static.developer.riotgames.com/docs/lol/queues.json');
         const queueData = await response.json();
