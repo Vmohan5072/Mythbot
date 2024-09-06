@@ -76,6 +76,14 @@ export async function execute(interaction) {
             return;
         }
 
+        // Collect general match info
+        const gameType = liveGameData.gameType || 'Unknown';
+        const gameMode = liveGameData.gameMode || 'Unknown';
+        const gameQueueConfigId = liveGameData.gameQueueConfigId || 'Unknown';
+        const gameLengthInSeconds = liveGameData.gameLength || 0;
+        const gameLengthMinutes = Math.floor(gameLengthInSeconds / 60);
+        const gameLengthSeconds = gameLengthInSeconds % 60;
+
         // Split players into red and blue team
         const playerTeam = liveGameData.participants.find(p => p.puuid === puuid).teamId;
         const playerTeamData = liveGameData.participants.filter(p => p.teamId === playerTeam);
@@ -85,7 +93,7 @@ export async function execute(interaction) {
         const embed = new EmbedBuilder()
             .setColor('#0099ff')
             .setTitle(`Live Game Data for ${username}`)
-            .setDescription('Here is the current live game information.')
+            .setDescription(`Game Type: ${gameType}\nGame Mode: ${gameMode}\nQueue Type: ${gameQueueConfigId}\nGame Length: ${gameLengthMinutes}m ${gameLengthSeconds}s`)
             .setTimestamp();
 
         // Add details about the player's team and opponent's team
