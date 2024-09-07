@@ -66,8 +66,8 @@ export async function setProfile(discordId, username, tagline, region) {
 
         // Insert or update the profile in the database, including the rank and last_update timestamp
         const query = `
-            INSERT INTO riot_profiles (discord_id, riot_username, tagline, region, solo_duo_rank, summoner_id, last_update)
-            VALUES ($1, $2, $3, $4, $5, $6, NOW())
+            INSERT INTO riot_profiles (discord_id, riot_username, tagline, region, solo_duo_rank, last_update, summoner_id)
+            VALUES ($1, $2, $3, $4, $5, NOW(), $6)
             ON CONFLICT (discord_id)
             DO UPDATE SET riot_username = EXCLUDED.riot_username, tagline = EXCLUDED.tagline, region = EXCLUDED.region, solo_duo_rank = EXCLUDED.solo_duo_rank, summoner_id = EXCLUDED.summoner_id, last_update = NOW();
         `;
