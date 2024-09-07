@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { getPuuidByRiotId, getAccIdByPuuid, getRankBySummID } from '../../API/riot-api.js';
-import { getProfile } from '../../profileFunctions.js';
+import { getProfile, updateRankInDatabase } from '../../profileFunctions.js';
 
 export const data = new SlashCommandBuilder()
     .setName('rankedinfo')
@@ -32,7 +32,9 @@ export async function execute(interaction) {
             username = username || userProfile.riot_username;
             tagline = tagline || userProfile.tagline;
             region = region || userProfile.region;
-        } else {
+        } 
+        
+        else {
             await interaction.reply({ content: 'Please provide your details or set up your profile with /setprofile.', ephemeral: true });
             return;
         }
@@ -47,7 +49,12 @@ export async function execute(interaction) {
         console.log(`Fetching PUUID for username: ${username}, tagline: ${tagline}, region: ${region}`);
         const puuid = await getPuuidByRiotId(username, tagline, region);
         const accountInfo = await getAccIdByPuuid(puuid, region);
-        const rankedData = await getRankBySummID(accountInfo.summId, region);
+
+        // Refresh rank and update it in the database
+        await refreshRank(interaction.user.id);
+
+        // Fetch the updated profile from the database (assuming it includes the updated rank)
+        const updatedProfile = await getProfile(interaction.user.id);
 
         const embed = new EmbedBuilder()
             .setColor('#0099ff')
@@ -55,12 +62,13 @@ export async function execute(interaction) {
             .setAuthor({ name: username + ' (' + tagline + ')' })
             .setDescription(`Detailed ranked stats for the summoner in ${region.toUpperCase()}.`)
             .addFields(
-                { name: 'Solo/Duo Queue', value: rankedData.solo ? `Tier: ${rankedData.solo.tier} ${rankedData.solo.rank} - ${rankedData.solo.leaguePoints} LP\n${rankedData.solo.wins}W ${rankedData.solo.losses}L` : 'Not available', inline: false },
-                { name: 'Flex Queue', value: rankedData.flex ? `Tier: ${rankedData.flex.tier} ${rankedData.flex.rank} - ${rankedData.flex.leaguePoints} LP\n${rankedData.flex.wins}W ${rankedData.flex.losses}L` : 'Not available', inline: false }
+                { name: 'Solo/Duo Queue', value: updatedProfile.solo_duo_rank || 'Unranked', inline: false }
             );
 
         await interaction.reply({ embeds: [embed] });
-    } catch (error) {
+    } 
+    
+    catch (error) {
         console.error('Error fetching summoner rank data:', error);
         await interaction.reply({ content: 'There was an error fetching the ranked data. Please try again later.', ephemeral: true });
     }
