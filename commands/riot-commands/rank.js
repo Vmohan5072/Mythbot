@@ -51,7 +51,7 @@ export async function execute(interaction) {
         const accountInfo = await getAccIdByPuuid(puuid, region);
 
         // Refresh rank and update it in the database
-        await refreshRank(interaction.user.id);
+        await refreshRank(accountInfo.summId);
 
         // Fetch the updated profile from the database (assuming it includes the updated rank)
         const updatedProfile = await getProfile(interaction.user.id);
