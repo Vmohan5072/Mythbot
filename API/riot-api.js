@@ -21,7 +21,9 @@ async function rateLimit() {
                 requestCount = 0;
                 resolve();
             }, 120000); // Wait 2 minutes
-        } else {
+        } 
+        
+        else {
             if (requestCount >= MAX_REQUESTS_PER_SECOND) {
                 console.log("Rate limit per second reached. Waiting for 1 second...");
                 setTimeout(() => {
@@ -42,11 +44,17 @@ export async function getPuuidByRiotId(username, tagLine, region) {
     let puuidRegion;
     if (["na1", "br1", "la1", "la2"].includes(region)) {
         puuidRegion = "americas";
-    } else if (["euw1", "eun1", "tr1", "me1"].includes(region)) {
+    } 
+    
+    else if (["euw1", "eun1", "tr1", "me1"].includes(region)) {
         puuidRegion = "europe";
-    } else if (["oc1", "ru1", "jp1", "kr", "ph2", "sg2", "tw2", "th2", "vn2"].includes(region)) {
+    } 
+    
+    else if (["oc1", "ru1", "jp1", "kr", "ph2", "sg2", "tw2", "th2", "vn2"].includes(region)) {
         puuidRegion = "asia";
-    } else {
+    } 
+    
+    else {
         throw new Error(`Invalid region code: ${region}`);
     }
     console.log(`https://${puuidRegion}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(username)}/${encodeURIComponent(tagLine)}?api_key=${riotApiKey}`);
@@ -107,6 +115,8 @@ export async function getAccIdByPuuid(puuid, region) {
 export async function getRankBySummID(summId, region) {
     await rateLimit(); // Call rate limit before proceeding
 
+    console.log(`Fetching rank for summoner ID: ${summId} in region: ${region}`); //temp logging
+    
     try {
         const response = await fetch(`https://${region}.api.riotgames.com/lol/league/v4/entries/by-summoner/${summId}?api_key=${riotApiKey}`);
         if (!response.ok) {
