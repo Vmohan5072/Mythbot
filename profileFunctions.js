@@ -1,4 +1,4 @@
-import { getRankBySummID } from './API/riot-api.js';
+import { getRankBySummID, getPuuidByRiotId, getAccIdByPuuid } from './API/riot-api.js';
 import pkg from 'pg';
 const { Client } = pkg;
 
