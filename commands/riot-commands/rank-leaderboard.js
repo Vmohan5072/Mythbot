@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { getProfileLeaderboard } from '../../databaseFunctions.js';
+import { getProfileLeaderboard } from '../../profileFunctions.js';
 
 // Helper function to sort ranks
 function rankSort(rank) {
