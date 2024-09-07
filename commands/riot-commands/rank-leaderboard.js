@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { getProfileLeaderboard } from '../../databaseFunctions.js'; // Assuming this will query the leaderboard from your DB
+import { getProfileLeaderboard } from '../../databaseFunctions.js';
 
 // Helper function to sort ranks
 function rankSort(rank) {
@@ -35,7 +35,7 @@ export async function execute(interaction) {
 
     try {
         // Fetch leaderboard data from the database
-        const leaderboard = await getProfileLeaderboard(); // This function should query and return users with their ranks
+        const leaderboard = await getProfileLeaderboard();
 
         if (!leaderboard || leaderboard.length === 0) {
             await interaction.editReply({ content: 'No users found in the leaderboard.', ephemeral: true });
@@ -45,19 +45,19 @@ export async function execute(interaction) {
         // Sort the leaderboard by rank
         const sortedLeaderboard = leaderboard.sort((a, b) => rankSort(a.solo_duo_rank) - rankSort(b.solo_duo_rank));
 
-        // Build the embed for leaderboard data
+        // Build the embed
         const embed = new EmbedBuilder()
             .setColor('#0099ff')
             .setTitle('Solo/Duo Rank Leaderboard')
             .setDescription('Here is the rank leaderboard based on Solo/Duo ranks.')
             .setTimestamp();
 
-        // Construct the leaderboard
+        // Build the leaderboard 
         let leaderboardText = '';
         sortedLeaderboard.forEach((user, index) => {
             leaderboardText += `**#${index + 1}: ${user.discord_username}**\n` +
-                               `Riot ID: ${user.riot_username}#${user.riot_tag}\n` +
-                               `Rank: ${user.solo_duo_rank || 'Unranked'}\n\n`; // Default to 'Unranked' if solo_duo_rank is empty
+                                `Riot ID: ${user.riot_username}#${user.tagline}\n` +  
+                                `Rank: ${user.solo_duo_rank || 'Unranked'}\n\n`; // Default to 'Unranked' if solo_duo_rank is empty
         });
 
         // Add the leaderboard to the embed

@@ -118,6 +118,23 @@ export async function refreshRank(discordId) {
     }
 }
 
+export async function getProfileLeaderboard() {
+    try {
+        const res = await client.query(`
+            SELECT discord_id, riot_username, tagline, solo_duo_rank 
+            FROM riot_profiles 
+            WHERE solo_duo_rank IS NOT NULL
+            ORDER BY solo_duo_rank DESC;
+        `);
+
+        return res.rows; // Return the leaderboard data
+    } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+        return [];
+    }
+}
+
+
 // Function to disconnect from the database
 export function closeConnection() {
     client.end();
