@@ -118,7 +118,7 @@ export async function refreshRank(discordId) {
         console.error('Error refreshing rank:', error);
     }
 }
-
+// Query to select and sort profiles by rank hierarchy
 export async function getProfileLeaderboard() {
     try {
         const res = await client.query(`

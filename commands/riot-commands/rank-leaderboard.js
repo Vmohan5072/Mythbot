@@ -21,7 +21,7 @@ function rankSort(rank) {
     }
 
     const [tier, division] = rank.split(' ');
-    const divisionValue = division ? parseInt(division.replace('IV', '1').replace('III', '2').replace('II', '3').replace('I', '4')) : 5; // Default division value for non-tier ranks
+    const divisionValue = division ? parseInt(division.replace('IV', '1').replace('III', '2').replace('II', '3').replace('I', '4')) : 5; // Converts division to numbers
 
     return rankOrder[tier] * 10 + (5 - divisionValue); // Higher ranks come first
 }
@@ -57,7 +57,7 @@ export async function execute(interaction) {
         sortedLeaderboard.forEach((user, index) => {
             leaderboardText += `**#${index + 1}: ${user.discord_username}**\n` +
                                 `Riot ID: ${user.riot_username}#${user.tagline}\n` +  
-                                `Rank: ${user.solo_duo_rank || 'Unranked'}\n\n`; // Default to 'Unranked' if solo_duo_rank is empty
+                                `Rank: ${user.solo_duo_rank || 'Unranked'}\n\n`; // Default to 'Unranked' if solo_duo_rank field is empty
         });
 
         // Add the leaderboard to the embed

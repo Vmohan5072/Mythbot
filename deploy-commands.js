@@ -53,7 +53,7 @@ const rest = new REST().setToken(DISCORD_TOKEN);
         console.log(`Started refreshing ${commands.length} application (/) commands.`);
 
         const data = await rest.put(
-            Routes.applicationGuildCommands(APP_ID, GUILD_ID),
+            Routes.applicationGuildCommands(APP_ID), //Deployment changed to global
             { body: commands },
         );
 
