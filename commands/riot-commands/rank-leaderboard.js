@@ -54,11 +54,15 @@ export async function execute(interaction) {
 
         // Build the leaderboard 
         let leaderboardText = '';
-        sortedLeaderboard.forEach((user, index) => {
-            leaderboardText += `**#${index + 1}: ${user.discord_username}**\n` +
+        for (const [index, user] of sortedLeaderboard.entries()) {
+            // Fetch the Discord username from the discord_id
+            const discordUser = await interaction.client.users.fetch(user.discord_id);
+            const discordUsername = discordUser ? discordUser.username : 'Unknown User'; // Fetches username for the provided discord id
+
+            leaderboardText += `**#${index + 1}: ${discordUsername}**\n` +
                                 `Riot ID: ${user.riot_username}#${user.tagline}\n` +  
                                 `Rank: ${user.solo_duo_rank || 'Unranked'}\n\n`; // Default to 'Unranked' if solo_duo_rank field is empty
-        });
+        }
 
         // Add the leaderboard to the embed
         embed.addFields({ name: 'Leaderboard', value: leaderboardText });
