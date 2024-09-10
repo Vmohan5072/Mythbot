@@ -1,4 +1,4 @@
-// TODO: Create rank and mastery leaderboard command, change command deployment to global, Rework region input handling, allow users to ping others to pull their riot info, adjust readme
+// TODO: Rework region input handling, allow users to ping others to pull their riot info, adjust readme
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { getPuuidByRiotId, getLiveGameDataBySummonerId, getRankBySummID, getMasteryListByPUUID, getChampionIdToNameMap, getQueueDescription } from '../../API/riot-api.js';
 import { getProfile } from '../../profileFunctions.js';
@@ -82,9 +82,6 @@ export async function execute(interaction) {
         }
 
         // Collect general match info
-        const gameType = liveGameData.gameType || 'Unknown';
-        const gameMode = liveGameData.gameMode || 'Unknown';
-        const gameQueueConfigId = liveGameData.gameQueueConfigId || 'Unknown';
         const gameLengthInSeconds = liveGameData.gameLength || 0;
         const gameLengthMinutes = Math.floor(gameLengthInSeconds / 60);
         const gameLengthSeconds = gameLengthInSeconds % 60;

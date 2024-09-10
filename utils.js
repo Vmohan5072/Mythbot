@@ -36,10 +36,37 @@ export async function InstallGlobalCommands(appId, commands) {
   }
 }
 
-// Simple method that returns a random emoji from list
-export function getRandomEmoji() {
-  const emojiList = ['😭','😄','😌','🤓','😎','😤','🤖','😶‍🌫️','🌏','📸','💿','👋','🌊','✨'];
-  return emojiList[Math.floor(Math.random() * emojiList.length)];
+// Function to normalize region input
+export function normalizeRegionInput(region) {
+  // Convert to lowercase
+  region = region.toLowerCase();
+
+  // Define region mappings for those without "1"
+  const regionMappings = {
+      "na": "na1",
+      "euw": "euw1",
+      "eune": "eun1",
+      "br": "br1",
+      "jp": "jp1",
+      "kr": "kr",
+      "oc": "oc1",
+      "ru": "ru1",
+      "tr": "tr1",
+      "la": "la1" // You can add more region mappings as needed
+  };
+
+  // If the region is already valid (like na1, euw1), return it directly
+  if (Object.values(regionMappings).includes(region)) {
+      return region;
+  }
+
+  // Check if the region is in the mappings and return the correct format (e.g., na -> na1)
+  if (region in regionMappings) {
+      return regionMappings[region];
+  }
+
+  // If it's not a recognized region, return the input as is (for cases like kr or already normalized ones)
+  return region;
 }
 
 export function capitalize(str) {
