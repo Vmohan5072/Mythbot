@@ -38,24 +38,24 @@ async function rateLimit() {
 }
 
 // Function to get puuid from gameName and tagline
-export async function getPuuidByRiotId(username, tagLine, region) {
+export async function getPuuidByRiotId(username, tagLine, normalizedRegion) {
     await rateLimit(); // Call rate limit before proceeding
 
     let puuidRegion;
-    if (["na1", "br1", "la1", "la2"].includes(region)) {
+    if (["na1", "br1", "la1", "la2"].includes(normalizedRegion)) {
         puuidRegion = "americas";
     } 
     
-    else if (["euw1", "eun1", "tr1", "me1"].includes(region)) {
+    else if (["euw1", "eun1", "tr1", "me1"].includes(normalizedRegion)) {
         puuidRegion = "europe";
     } 
     
-    else if (["oc1", "ru1", "jp1", "kr", "ph2", "sg2", "tw2", "th2", "vn2"].includes(region)) {
+    else if (["oc1", "ru1", "jp1", "kr", "ph2", "sg2", "tw2", "th2", "vn2"].includes(normalizedRegion)) {
         puuidRegion = "asia";
     } 
     
     else {
-        throw new Error(`Invalid region code: ${region}`);
+        throw new Error(`Invalid region code: ${normalizedRegion}`);
     }
     console.log(`https://${puuidRegion}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(username)}/${encodeURIComponent(tagLine)}?api_key=${riotApiKey}`);
 
@@ -80,11 +80,11 @@ export async function getPuuidByRiotId(username, tagLine, region) {
 }
 
 // Function to get accountID from PUUID
-export async function getAccIdByPuuid(puuid, region) {
+export async function getAccIdByPuuid(puuid, normalizedRegion) {
     await rateLimit(); // Call rate limit before proceeding
 
     try {
-        const response = await fetch(`https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${riotApiKey}`);
+        const response = await fetch(`https://${normalizedRegion}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${riotApiKey}`);
 
         if (!response.ok) {
             if (response.status === 429) {
@@ -112,13 +112,13 @@ export async function getAccIdByPuuid(puuid, region) {
 }
 
 // Function to get ranked info from summonerID
-export async function getRankBySummID(summId, region) {
+export async function getRankBySummID(summId, normalizedRegion) {
     await rateLimit(); // Call rate limit before proceeding
 
-    console.log(`Fetching rank for summoner ID: ${summId} in region: ${region}`); //temp logging
+    console.log(`Fetching rank for summoner ID: ${summId} in region: ${normalizedRegion}`); //temp logging
     
     try {
-        const response = await fetch(`https://${region}.api.riotgames.com/lol/league/v4/entries/by-summoner/${summId}?api_key=${riotApiKey}`);
+        const response = await fetch(`https://${normalizedRegion}.api.riotgames.com/lol/league/v4/entries/by-summoner/${summId}?api_key=${riotApiKey}`);
         if (!response.ok) {
             if (response.status === 429) {
                 await handleRateLimit(response);
@@ -149,15 +149,15 @@ export async function getRankBySummID(summId, region) {
 }
 
 // Function to get mastery list by PUUID
-export async function getMasteryListByPUUID(puuid, region) {
+export async function getMasteryListByPUUID(puuid, normalizedRegion) {
     await rateLimit(); // Call rate limit before proceeding
 
     try {
-        const response = await fetch(`https://${region}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}?api_key=${riotApiKey}`);
+        const response = await fetch(`https://${normalizedRegion}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}?api_key=${riotApiKey}`);
         if (!response.ok) {
             if (response.status === 429) {
                 await handleRateLimit(response);
-                return getMasteryListByPUUID(puuid, region); // Retry the request
+                return getMasteryListByPUUID(puuid, normalizedRegion); // Retry the request
             }
             throw new Error(`Failed to fetch mastery list info. Status: ${response.status}, Message: ${response.statusText}`);
         }
@@ -173,15 +173,15 @@ export async function getMasteryListByPUUID(puuid, region) {
 }
 
 // Function to get a limited mastery list by PUUID
-export async function getMasteryListCountByPUUID(puuid, region, champCount) {
+export async function getMasteryListCountByPUUID(puuid, normalizedRegion, champCount) {
     await rateLimit(); // Call rate limit before proceeding
 
     try {
-        const response = await fetch(`https://${region}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top?count=${champCount}&api_key=${riotApiKey}`);
+        const response = await fetch(`https://${normalizedRegion}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top?count=${champCount}&api_key=${riotApiKey}`);
         if (!response.ok) {
             if (response.status === 429) {
                 await handleRateLimit(response);
-                return getMasteryListCountByPUUID(puuid, region, champCount); // Retry the request
+                return getMasteryListCountByPUUID(puuid, normalizedRegion, champCount); // Retry the request
             }
             throw new Error(`Failed to fetch limited mastery list info. Status: ${response.status}, Message: ${response.statusText}`);
         }
@@ -197,18 +197,18 @@ export async function getMasteryListCountByPUUID(puuid, region, champCount) {
 }
 
 // Function to fetch live game data by summoner ID
-export async function getLiveGameDataBySummonerId(puuid, region) {
+export async function getLiveGameDataBySummonerId(puuid, normalizedRegion) {
     await rateLimit(); // Call rate limit before proceeding
-    console.log(`https://${region}.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/${puuid}?api_key=${riotApiKey}`); //temp logging
+    console.log(`https://${normalizedRegion}.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/${puuid}?api_key=${riotApiKey}`); //temp logging
     try {
-        const response = await fetch(`https://${region}.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/${puuid}?api_key=${riotApiKey}`);
+        const response = await fetch(`https://${normalizedRegion}.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/${puuid}?api_key=${riotApiKey}`);
         if (response.status === 404) {
             return null;
         }
         if (!response.ok) {
             if (response.status === 429) {
                 await handleRateLimit(response);
-                return getLiveGameDataBySummonerId(puuid, region); // Retry the request
+                return getLiveGameDataBySummonerId(puuid, normalizedRegion); // Retry the request
             }
             throw new Error(`Failed to fetch live game data. Status: ${response.status}, Message: ${response.statusText}`);
         }
@@ -223,8 +223,8 @@ export async function getLiveGameDataBySummonerId(puuid, region) {
 }
 
 // Function to fetch match IDs by time frame (split) limited to recent 5 matches
-export async function getMatchIdsByTimeFrame(puuid, region, startTime = SPLIT_START_DATE, endTime = SPLIT_END_DATE, limit = 5) {
-    const matchRegion = getMatchRoutingRegion(region);
+export async function getMatchIdsByTimeFrame(puuid, normalizedRegion, startTime = SPLIT_START_DATE, endTime = SPLIT_END_DATE, limit = 5) {
+    const matchRegion = getMatchRoutingRegion(normalizedRegion);
     let matchIds = [];
     let start = 0;
     const count = limit;
@@ -245,10 +245,10 @@ export async function getMatchIdsByTimeFrame(puuid, region, startTime = SPLIT_ST
 }
 
 // Function to get match details by match ID
-export async function getMatchDetails(matchId, region) {
+export async function getMatchDetails(matchId, normalizedRegion) {
     await rateLimit(); // Call rate limit before proceeding
 
-    const matchRegion = getMatchRoutingRegion(region);
+    const matchRegion = getMatchRoutingRegion(normalizedRegion);
 
     try {
         const response = await fetch(`https://${matchRegion}.api.riotgames.com/lol/match/v5/matches/${matchId}?api_key=${riotApiKey}`);
@@ -289,13 +289,13 @@ export async function getQueueDescription(queueId) {
 }
 
 // Function to calculate general win rate over a limited number of matches
-export async function getSplitWinRate(puuid, region, matchLimit = 10) {
-    const matchIds = await getMatchIdsByTimeFrame(puuid, region, SPLIT_START_DATE, SPLIT_END_DATE, matchLimit);
+export async function getSplitWinRate(puuid, normalizedRegion, matchLimit = 10) {
+    const matchIds = await getMatchIdsByTimeFrame(puuid, normalizedRegion, SPLIT_START_DATE, SPLIT_END_DATE, matchLimit);
     let totalGames = 0;
     let totalWins = 0;
 
     for (const matchId of matchIds) {
-        const matchDetails = await getMatchDetails(matchId, region);
+        const matchDetails = await getMatchDetails(matchId, normalizedRegion);
         const participant = matchDetails.info.participants.find(p => p.puuid === puuid);
         if (participant) {
             totalGames += 1;
@@ -313,13 +313,13 @@ export async function getSplitWinRate(puuid, region, matchLimit = 10) {
 }
 
 // Function to calculate champion-specific win rate over a limited number of matches
-export async function getChampionSplitWinRate(puuid, region, championId, matchLimit = 10) {
-    const matchIds = await getMatchIdsByTimeFrame(puuid, region, SPLIT_START_DATE, SPLIT_END_DATE, matchLimit);
+export async function getChampionSplitWinRate(puuid, normalizedRegion, championId, matchLimit = 10) {
+    const matchIds = await getMatchIdsByTimeFrame(puuid, normalizedRegion, SPLIT_START_DATE, SPLIT_END_DATE, matchLimit);
     let championGames = 0;
     let championWins = 0;
 
     for (const matchId of matchIds) {
-        const matchDetails = await getMatchDetails(matchId, region);
+        const matchDetails = await getMatchDetails(matchId, normalizedRegion);
         const participant = matchDetails.info.participants.find(p => p.puuid === puuid);
         if (participant && participant.championId === championId) {
             championGames += 1;
@@ -375,7 +375,7 @@ async function handleRateLimit(response) {
     }
 }
 
-// Helper function to determine match region
+// Helper function to determine match region (TODO: Reduce redundancy)
 function getMatchRoutingRegion(region) {
     if (["na1", "br1", "la1", "la2", "oc1"].includes(region)) {
         return "americas";

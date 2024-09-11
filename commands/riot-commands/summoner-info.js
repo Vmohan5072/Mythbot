@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { normalizeRegionInput } from '../../utils';
 import { getPuuidByRiotId, getAccIdByPuuid, getRankBySummID, getMasteryListCountByPUUID, getChampionIdToNameMap } from '../../API/riot-api.js';
 import { getProfile } from '../../profileFunctions.js';
 
@@ -21,8 +22,8 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
     let username = interaction.options.getString('username');
     let tagline = interaction.options.getString('tagline');
-    let region = interaction.options.getString('region');
-    
+    let normalizedRegion = normalizeRegionInput(interaction.options.getString('region'));
+
     // If string fields empty, check for user profile
     if (!username || !tagline || !region) {
         const userProfile = await getProfile(interaction.user.id);
@@ -43,16 +44,16 @@ export async function execute(interaction) {
         return;
     }
 
-    console.log(`Fetching PUUID for username: ${username}, tagline: ${tagline}, region: ${region}`);
+    console.log(`Fetching PUUID for username: ${username}, tagline: ${tagline}, region: ${normalizedRegion}`);
     try {
-        const puuid = await getPuuidByRiotId(username, tagline, region);
+        const puuid = await getPuuidByRiotId(username, tagline, normalizedRegion);
         if (!puuid) {
-            throw new Error(`PUUID not found for username: ${username}, tagline: ${tagline}, region: ${region}`);
+            throw new Error(`PUUID not found for username: ${username}, tagline: ${tagline}, region: ${normalizedRegion}`);
         }
 
-        const summonerInfo = await getAccIdByPuuid(puuid, region);
-        const rankedData = await getRankBySummID(summonerInfo.summId, region);
-        const topChampions = await getMasteryListCountByPUUID(puuid, region, 3);
+        const summonerInfo = await getAccIdByPuuid(puuid, normalizedRegion);
+        const rankedData = await getRankBySummID(summonerInfo.summId, normalizedRegion);
+        const topChampions = await getMasteryListCountByPUUID(puuid, normalizedRegion, 3);
         const championIdToNameMap = await getChampionIdToNameMap();
 
         const embed = new EmbedBuilder()

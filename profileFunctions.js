@@ -1,4 +1,5 @@
 import { getRankBySummID, getPuuidByRiotId, getAccIdByPuuid } from './API/riot-api.js';
+import { setProfile } from '../../profileFunctions.js';
 import pkg from 'pg';
 const { Client } = pkg;
 
@@ -39,8 +40,10 @@ export async function getProfile(discordId) {
 // Set Profile and save rank to Postgres database
 export async function setProfile(discordId, username, tagline, region) {
     try {
+
+        const normalizedRegion = normalizeRegionInput(region);
         // Fetch summoner information from the Riot API
-        const puuid = await getPuuidByRiotId(username, tagline, region);
+        const puuid = await getPuuidByRiotId(username, tagline, normalizedRegion);
 
         if (!puuid) {
             console.error('Could not find summoner information.');
@@ -48,7 +51,7 @@ export async function setProfile(discordId, username, tagline, region) {
         }
 
         // Fetch summoner ID and account info
-        const summonerInfo = await getAccIdByPuuid(puuid, region);
+        const summonerInfo = await getAccIdByPuuid(puuid, normalizedRegion);
         if (!summonerInfo) {
             console.error('Could not retrieve summoner account information.');
             return;
@@ -57,7 +60,7 @@ export async function setProfile(discordId, username, tagline, region) {
         const summonerId = summonerInfo.summId;
 
         // Fetch rank information using summoner ID
-        const rankData = await getRankBySummID(summonerId, region);
+        const rankData = await getRankBySummID(summonerId, normalizedRegion);
         let soloDuoRank = 'Unranked';
 
         if (rankData && rankData.solo) {
@@ -71,7 +74,7 @@ export async function setProfile(discordId, username, tagline, region) {
             ON CONFLICT (discord_id)
             DO UPDATE SET riot_username = EXCLUDED.riot_username, tagline = EXCLUDED.tagline, region = EXCLUDED.region, solo_duo_rank = EXCLUDED.solo_duo_rank, summoner_id = EXCLUDED.summoner_id, last_update = NOW();
         `;
-        await client.query(query, [discordId, username, tagline, region, soloDuoRank, summonerId]);
+        await client.query(query, [discordId, username, tagline, normalizedRegion, soloDuoRank, summonerId]);
 
         console.log(`Profile set for ${username}: Rank - ${soloDuoRank}`);
     } 

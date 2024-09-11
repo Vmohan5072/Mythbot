@@ -21,12 +21,12 @@ export async function execute(interaction) {
     const userId = interaction.user.id;  // Discord user ID
     const username = interaction.options.getString('username');
     const tagline = interaction.options.getString('tagline');
-    const region = interaction.options.getString('region');
+    let normalizedRegion = normalizeRegionInput(interaction.options.getString('region'));
 
     try {
         // Save or update user profile in Postgres
-        await setProfile(userId, username, tagline, region);
-        await interaction.reply(`Your profile has been saved: **${username}** ${tagline} (${region})`);
+        await setProfile(userId, username, tagline, normalizedRegion);
+        await interaction.reply(`Your profile has been saved: **${username}** ${tagline} (${normalizedRegion})`);
     } catch (error) {
         console.error('Error setting profile:', error);
         await interaction.reply('There was an error saving your profile. Please try again later.');

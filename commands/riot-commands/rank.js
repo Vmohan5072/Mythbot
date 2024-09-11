@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { getPuuidByRiotId, getAccIdByPuuid, getRankBySummID } from '../../API/riot-api.js';
+import { normalizeRegionInput } from '../../utils';
 import { getProfile, refreshRank } from '../../profileFunctions.js';
 
 export const data = new SlashCommandBuilder()
@@ -21,7 +22,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
     let username = interaction.options.getString('username');
     let tagline = interaction.options.getString('tagline');
-    let region = interaction.options.getString('region');
+    let normalizedRegion = normalizeRegionInput(interaction.options.getString('region'));
 
     // If string fields are empty, check for user profile
     if (!username || !tagline || !region) {
@@ -46,9 +47,9 @@ export async function execute(interaction) {
     }
 
     try {
-        console.log(`Fetching PUUID for username: ${username}, tagline: ${tagline}, region: ${region}`);
-        const puuid = await getPuuidByRiotId(username, tagline, region);
-        const accountInfo = await getAccIdByPuuid(puuid, region);
+        console.log(`Fetching PUUID for username: ${username}, tagline: ${tagline}, region: ${normalizedRegion}`);
+        const puuid = await getPuuidByRiotId(username, tagline, normalizedRegion);
+        const accountInfo = await getAccIdByPuuid(puuid, normalizedRegion);
 
         // Refresh rank and update it in the database
         await refreshRank(accountInfo.summId);

@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { normalizeRegionInput } from '../../utils';
 import { getPuuidByRiotId, getMasteryListByPUUID, getMasteryListCountByPUUID, getChampionIdToNameMap } from '../../API/riot-api.js';
 import { getProfile } from '../../profileFunctions.js'; // Import getProfile
 
@@ -25,7 +26,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
     let username = interaction.options.getString('username');
     let tagline = interaction.options.getString('tagline');
-    let region = interaction.options.getString('region');
+    let normalizedRegion = normalizeRegionInput(interaction.options.getString('region'));
     const count = interaction.options.getInteger('count');
 
     // Fetch user profile if no name is provided
@@ -43,10 +44,10 @@ export async function execute(interaction) {
 
     try {
         // Fetch PUUID and mastery data
-        const puuid = await getPuuidByRiotId(username, tagline, region);
+        const puuid = await getPuuidByRiotId(username, tagline, normalizedRegion);
         const champMasteryData = count // Check if count is provided, otherwise default to showing all champs
-            ? await getMasteryListCountByPUUID(puuid, region, count)  
-            : await getMasteryListByPUUID(puuid, region);
+            ? await getMasteryListCountByPUUID(puuid, normalizedRegion, count)  
+            : await getMasteryListByPUUID(puuid, normalizedRegion);
 
         const championIdToNameMap = await getChampionIdToNameMap();
         if (!championIdToNameMap) {

@@ -1,5 +1,6 @@
-// TODO: Rework region input handling, allow users to ping others to pull their riot info, adjust readme
+// TODO: Rework region input handling, allow users to ping others to pull their riot info, adjust readme, refactoring codebase
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { normalizeRegionInput } from '../../utils';
 import { getPuuidByRiotId, getLiveGameDataBySummonerId, getRankBySummID, getMasteryListByPUUID, getChampionIdToNameMap, getQueueDescription } from '../../API/riot-api.js';
 import { getProfile } from '../../profileFunctions.js';
 
@@ -25,10 +26,11 @@ export async function execute(interaction) {
 
     let username = interaction.options.getString('username');
     let tagline = interaction.options.getString('tagline');
-    let region = interaction.options.getString('region');
+    let normalizedRegion = normalizeRegionInput(interaction.options.getString('region'));
+
 
     // Fetch user profile from the database if the username/tagline/region are not provided
-    if (!username || !tagline || !region) {
+    if (!username || !tagline || !normalizedRegion) {
         const userProfile = await getProfile(interaction.user.id);
         if (userProfile) {
             username = username || userProfile.riot_username;
@@ -40,7 +42,7 @@ export async function execute(interaction) {
         }
     }
 
-    console.log(`Fetching live game data for username: ${username}, tagline: ${tagline}, region: ${region}`);
+    console.log(`Fetching live game data for username: ${username}, tagline: ${tagline}, region: ${normalizedRegion}`);
 
     // Regex conversion function to remove number after region for op.gg link
     const convertRegion = (regionWithNumber) => {
@@ -48,22 +50,22 @@ export async function execute(interaction) {
     };
 
     // Create op.gg link for each player
-    const constructOpGGUrl = (region, riotId) => {
-        const formattedRegion = convertRegion(region);
+    const constructOpGGUrl = (normalizedRegion, riotId) => {
+        const formattedRegion = convertRegion(normalizedRegion);
         const [riotUsername, riotTag] = riotId.split('#');  // Split riotId into username and tag
         const encodedUsername = encodeURIComponent(riotUsername);
         return `https://www.op.gg/summoners/${formattedRegion}/${encodedUsername}-${riotTag}`;
     };
 
     try {
-        const puuid = await getPuuidByRiotId(username, tagline, region);
+        const puuid = await getPuuidByRiotId(username, tagline, normalizedRegion);
 
         if (!puuid) {
             await interaction.editReply({ content: `Could not find a player with the username: ${username} and tagline: ${tagline} in the ${region.toUpperCase()} region.`, ephemeral: true });
             return;
         }
 
-        const liveGameData = await getLiveGameDataBySummonerId(puuid, region);
+        const liveGameData = await getLiveGameDataBySummonerId(puuid, normalizedRegion);
 
         if (!liveGameData) {
             await interaction.editReply({ content: `No live game data found for the player: ${username}. They might not be in a game currently.`, ephemeral: true });
@@ -105,8 +107,8 @@ export async function execute(interaction) {
         for (const participant of playerTeamData) {
             const championName = championIdToNameMap[participant.championId] || 'Unknown Champion';
             const summId = participant.summonerId;
-            const rankData = await getRankBySummID(summId, region);
-            const masteryData = await getMasteryListByPUUID(participant.puuid, region);
+            const rankData = await getRankBySummID(summId, normalizedRegion);
+            const masteryData = await getMasteryListByPUUID(participant.puuid, normalizedRegion);
             const champMastery = masteryData.find(mastery => mastery.championId === participant.championId)?.championPoints || 'N/A';
             const soloRank = rankData.solo ? `${rankData.solo.tier} ${rankData.solo.rank}` : 'Unranked';
             const opGGUrl = constructOpGGUrl(region, participant.riotId);
@@ -117,8 +119,8 @@ export async function execute(interaction) {
         for (const participant of opposingTeamData) {
             const championName = championIdToNameMap[participant.championId] || 'Unknown Champion';
             const summId = participant.summonerId;
-            const rankData = await getRankBySummID(summId, region);
-            const masteryData = await getMasteryListByPUUID(participant.puuid, region);
+            const rankData = await getRankBySummID(summId, normalizedRegion);
+            const masteryData = await getMasteryListByPUUID(participant.puuid, normalizedRegion);
             const champMastery = masteryData.find(mastery => mastery.championId === participant.championId)?.championPoints || 'N/A';
             const soloRank = rankData.solo ? `${rankData.solo.tier} ${rankData.solo.rank}` : 'Unranked';
             const opGGUrl = constructOpGGUrl(region, participant.riotId);
