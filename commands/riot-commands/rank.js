@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { getPuuidByRiotId, getAccIdByPuuid, getRankBySummID } from '../../API/riot-api.js';
-import { normalizeRegionInput } from '../../utils';
+import { normalizeRegionInput } from '../../utils.js';
 import { getProfile, refreshRank } from '../../profileFunctions.js';
 
 export const data = new SlashCommandBuilder()

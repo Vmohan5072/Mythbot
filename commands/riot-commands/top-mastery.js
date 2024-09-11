@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { normalizeRegionInput } from '../../utils';
+import { normalizeRegionInput } from '../../utils.js';
 import { getPuuidByRiotId, getMasteryListByPUUID, getMasteryListCountByPUUID, getChampionIdToNameMap } from '../../API/riot-api.js';
-import { getProfile } from '../../profileFunctions.js'; // Import getProfile
+import { getProfile } from '../../profileFunctions.js';
 
 export const data = new SlashCommandBuilder()
     .setName('mastery')

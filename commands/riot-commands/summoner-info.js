@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { normalizeRegionInput } from '../../utils';
+import { normalizeRegionInput } from '../../utils.js';
 import { getPuuidByRiotId, getAccIdByPuuid, getRankBySummID, getMasteryListCountByPUUID, getChampionIdToNameMap } from '../../API/riot-api.js';
 import { getProfile } from '../../profileFunctions.js';
 
