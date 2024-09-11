@@ -44,7 +44,7 @@ export async function execute(interaction) {
         return;
     }
 
-    console.log(`Fetching PUUID for username: ${username}, tagline: ${tagline}, region: ${normalizedRegion}`);
+    console.log(`Fetching PUUID for username: ${username}, tagline: ${tagline}, region: ${region}`);
     try {
         let normalizedRegion = normalizeRegionInput(region);
         const puuid = await getPuuidByRiotId(username, tagline, normalizedRegion);
