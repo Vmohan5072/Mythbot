@@ -26,7 +26,8 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
     let username = interaction.options.getString('username');
     let tagline = interaction.options.getString('tagline');
-    let normalizedRegion = normalizeRegionInput(interaction.options.getString('region'));
+    let region = interaction.options.getString('region');
+    let normalizedRegion = normalizeRegionInput(region);
     const count = interaction.options.getInteger('count');
 
     // Fetch user profile if no name is provided

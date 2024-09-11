@@ -26,8 +26,8 @@ export async function execute(interaction) {
 
     let username = interaction.options.getString('username');
     let tagline = interaction.options.getString('tagline');
-    let normalizedRegion = normalizeRegionInput(interaction.options.getString('region'));
-
+    let region = interaction.options.getString('region');
+    let normalizedRegion = normalizeRegionInput(region);
 
     // Fetch user profile from the database if the username/tagline/region are not provided
     if (!username || !tagline || !normalizedRegion) {
