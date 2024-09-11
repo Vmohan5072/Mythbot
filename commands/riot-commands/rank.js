@@ -23,7 +23,6 @@ export async function execute(interaction) {
     let username = interaction.options.getString('username');
     let tagline = interaction.options.getString('tagline');
     let region = interaction.options.getString('region');
-    let normalizedRegion = normalizeRegionInput(region);
 
     // If string fields are empty, check for user profile
     if (!username || !tagline || !region) {
@@ -48,6 +47,7 @@ export async function execute(interaction) {
     }
 
     try {
+        let normalizedRegion = normalizeRegionInput(region);
         console.log(`Fetching PUUID for username: ${username}, tagline: ${tagline}, region: ${normalizedRegion}`);
         const puuid = await getPuuidByRiotId(username, tagline, normalizedRegion);
         const accountInfo = await getAccIdByPuuid(puuid, normalizedRegion);

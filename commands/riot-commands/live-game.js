@@ -27,7 +27,6 @@ export async function execute(interaction) {
     let username = interaction.options.getString('username');
     let tagline = interaction.options.getString('tagline');
     let region = interaction.options.getString('region');
-    let normalizedRegion = normalizeRegionInput(region);
 
     // Fetch user profile from the database if the username/tagline/region are not provided
     if (!username || !tagline || !normalizedRegion) {
@@ -58,6 +57,7 @@ export async function execute(interaction) {
     };
 
     try {
+        let normalizedRegion = normalizeRegionInput(region);
         const puuid = await getPuuidByRiotId(username, tagline, normalizedRegion);
 
         if (!puuid) {

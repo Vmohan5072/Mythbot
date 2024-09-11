@@ -27,7 +27,6 @@ export async function execute(interaction) {
     let username = interaction.options.getString('username');
     let tagline = interaction.options.getString('tagline');
     let region = interaction.options.getString('region');
-    let normalizedRegion = normalizeRegionInput(region);
     const count = interaction.options.getInteger('count');
 
     // Fetch user profile if no name is provided
@@ -44,6 +43,7 @@ export async function execute(interaction) {
     }
 
     try {
+        let normalizedRegion = normalizeRegionInput(region);
         // Fetch PUUID and mastery data
         const puuid = await getPuuidByRiotId(username, tagline, normalizedRegion);
         const champMasteryData = count // Check if count is provided, otherwise default to showing all champs
