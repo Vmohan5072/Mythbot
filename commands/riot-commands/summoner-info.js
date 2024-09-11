@@ -23,10 +23,9 @@ export async function execute(interaction) {
     let username = interaction.options.getString('username');
     let tagline = interaction.options.getString('tagline');
     let region = interaction.options.getString('region');
-    let normalizedRegion = normalizeRegionInput(region);
 
     // If string fields empty, check for user profile
-    if (!username || !tagline || !normalizedRegion) {
+    if (!username || !tagline || !region) {
         const userProfile = await getProfile(interaction.user.id);
         console.log('User profile fetched:', userProfile); // More temp logging
 
@@ -47,6 +46,7 @@ export async function execute(interaction) {
 
     console.log(`Fetching PUUID for username: ${username}, tagline: ${tagline}, region: ${normalizedRegion}`);
     try {
+        let normalizedRegion = normalizeRegionInput(region);
         const puuid = await getPuuidByRiotId(username, tagline, normalizedRegion);
         if (!puuid) {
             throw new Error(`PUUID not found for username: ${username}, tagline: ${tagline}, region: ${normalizedRegion}`);
