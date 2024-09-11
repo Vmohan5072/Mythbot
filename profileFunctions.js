@@ -1,5 +1,4 @@
 import { getRankBySummID, getPuuidByRiotId, getAccIdByPuuid } from './API/riot-api.js';
-import { setProfile } from '../../profileFunctions.js';
 import pkg from 'pg';
 const { Client } = pkg;
 
