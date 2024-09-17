@@ -135,7 +135,7 @@ async function balanceTeams(lobby, buttonInteraction) {
             .setDescription('Please wait while we balance the teams...')
             .setColor('#FFFF00');
 
-        // Notify the creator that balancing is in progress, but don't make it ephemeral
+        // Notify the creator that balancing is in progress
         await buttonInteraction.reply({ embeds: [embed], ephemeral: true });
 
         const region = 'na1'; // Default region to NA1 if not set
@@ -173,7 +173,7 @@ async function balanceTeams(lobby, buttonInteraction) {
                     rank,
                     rankPoints,
                     winRate,
-                    totalGames,
+                    totalGames, // Include totalGames for unranked players
                 });
 
                 // Pace API calls over 6 seconds to avoid rate limits
@@ -190,12 +190,12 @@ async function balanceTeams(lobby, buttonInteraction) {
         }
 
         const teams = generateBalancedTeams(playerData);
-        const team1 = teams.team1.map(p => `<@${p.id}> (${p.rank} ${p.rankPoints} LP)`).join('\n');
-        const team2 = teams.team2.map(p => `<@${p.id}> (${p.rank} ${p.rankPoints} LP)`).join('\n');
+        const team1 = teams.team1.map(p => `<@${p.id}> (${p.rank}${p.rank !== 'Unranked' ? `, ${p.rankPoints} LP` : `, ${p.totalGames} Games`})`).join('\n');
+        const team2 = teams.team2.map(p => `<@${p.id}> (${p.rank}${p.rank !== 'Unranked' ? `, ${p.rankPoints} LP` : `, ${p.totalGames} Games`})`).join('\n');
 
         const balancedEmbed = new EmbedBuilder()
             .setTitle('Teams Balanced')
-            .setDescription('Teams have been balanced based on ranks and winrates.')
+            .setDescription('Teams have been balanced based on ranks and total games played for unranked players.')
             .addFields(
                 { name: 'Team 1', value: team1 || 'N/A', inline: true },
                 { name: 'Team 2', value: team2 || 'N/A', inline: true }
@@ -211,56 +211,101 @@ async function balanceTeams(lobby, buttonInteraction) {
     }
 }
 
-// Function to convert rank to a set number
-function rankToValue(rank) {
+// Function to convert rank to a set elo number
+function rankToValue(rank, totalGames = 0) {
     const rankValues = {
-        'IRON': 1,
-        'BRONZE': 2,
-        'SILVER': 3,
-        'GOLD': 4,
-        'PLATINUM': 5,
-        'DIAMOND': 6,
-        'MASTER': 7,
-        'GRANDMASTER': 8,
-        'CHALLENGER': 9
+        'IRON': 100,
+        'BRONZE': 200,
+        'SILVER': 300,
+        'GOLD': 400,
+        'PLATINUM': 500,
+        'DIAMOND': 600,
+        'MASTER': 700,
+        'GRANDMASTER': 800,
+        'CHALLENGER': 900
     };
 
     const divisionValues = {
         'IV': 0,
-        'III': 0.25,
-        'II': 0.5,
-        'I': 0.75
+        'III': 25,
+        'II': 50,
+        'I': 75
     };
 
-    if (rank === 'Unranked') return 0;
+    if (rank === 'Unranked') {
+        // Set baseline at Iron 4, skill ceiling at Gold 4 depending on total games played
+        return 100 + Math.min(totalGames, 375);
+    }
 
     const [tier, division] = rank.split(' ');
-    return rankValues[tier] + (divisionValues[division] || 0);
+    return (rankValues[tier] || 0) + (divisionValues[division] || 0);
 }
 
-// Algorithm to balance teams
+// Algorithm to balance teams based on skill rating
 function generateBalancedTeams(playerData) {
-    playerData.forEach(player => {
-        player.rankValue = rankToValue(player.rank);
-    });
+    const n = playerData.length;
+    let minDifference = Infinity;
+    let bestTeam1 = [];
+    let bestTeam2 = [];
 
-    playerData.sort((a, b) => b.rankValue - a.rankValue);
+    const targetTeamSize = Math.floor(n / 2);
 
-    const team1 = [];
-    const team2 = [];
-
-    let team1TotalRank = 0;
-    let team2TotalRank = 0;
-
-    playerData.forEach(player => {
-        if (team1TotalRank <= team2TotalRank) {
-            team1.push(player);
-            team1TotalRank += player.rankValue;
-        } else {
-            team2.push(player);
-            team2TotalRank += player.rankValue;
+    // Function to generate all possible team splits with pruning
+    function generateSplits(index, team1, team2, team1Skill, team2Skill) {
+        // Base case: All players have been assigned
+        if (index === n) {
+            const difference = Math.abs(team1Skill - team2Skill);
+            if (difference < minDifference) {
+                minDifference = difference;
+                bestTeam1 = [...team1];
+                bestTeam2 = [...team2];
+            }
+            return;
         }
-    });
 
-    return { team1, team2 };
+        const player = playerData[index];
+
+        // Assign player to Team 1 if team1 is not yet full
+        if (team1.length < targetTeamSize) {
+            team1.push(player);
+            const newTeam1Skill = team1Skill + player.rankValue;
+
+            // Calculate the minimum possible difference if assigning to Team 1
+            const potentialDifference = Math.abs(newTeam1Skill - team2Skill);
+            if (potentialDifference < minDifference) { // Prune if promising
+                generateSplits(
+                    index + 1,
+                    team1,
+                    team2,
+                    newTeam1Skill,
+                    team2Skill
+                );
+            }
+            team1.pop();
+        }
+
+        // Assign player to Team 2 if team2 is not yet full
+        if (team2.length < targetTeamSize) {
+            team2.push(player);
+            const newTeam2Skill = team2Skill + player.rankValue;
+
+            // Calculate the minimum possible difference if assigning to Team 2
+            const potentialDifference = Math.abs(team1Skill - newTeam2Skill);
+            if (potentialDifference < minDifference) { // Prune if promising
+                generateSplits(
+                    index + 1,
+                    team1,
+                    team2,
+                    team1Skill,
+                    newTeam2Skill
+                );
+            }
+            team2.pop();
+        }
+    }
+
+    // Start generating splits
+    generateSplits(0, [], [], 0, 0);
+
+    return { team1: bestTeam1, team2: bestTeam2 };
 }
