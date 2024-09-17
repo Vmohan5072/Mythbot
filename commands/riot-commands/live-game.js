@@ -90,14 +90,14 @@ export async function execute(interaction) {
         const puuid = await getPuuidByRiotId(username, tagline, normalizedRegion);
 
         if (!puuid) {
-            await interaction.editReply({ content: `Could not find a player with the username: ${username} and tagline: ${tagline} in the ${region.toUpperCase()} region.`, ephemeral: true });
+            await interaction.editReply({ content: `Could not find a player with the username: ${username}#${tagline} in the ${region.toUpperCase()} region.`, ephemeral: true });
             return;
         }
 
         const liveGameData = await getLiveGameDataBySummonerId(puuid, normalizedRegion);
 
         if (!liveGameData) {
-            await interaction.editReply({ content: `No live game data found for the player: ${username}. They might not be in a game currently.`, ephemeral: true });
+            await interaction.editReply({ content: `No live game data found for the player: ${username}#${tagline}. They might not be in a game currently.`, ephemeral: true });
             return;
         }
 
