@@ -91,7 +91,7 @@ export async function execute(interaction) {
         // Populate top champion template with champion info
         topChampions.forEach((champion, index) => {
             const championName = championIdToNameMap[champion.championId] || 'Unknown Champion';
-            const championPoints = champion.championPoints || 'N/A';
+            const championPoints = champion.championPoints ? champion.championPoints.toLocaleString() : 'N/A';
             const championLevel = champion.championLevel || 'N/A';
 
             embed.addFields(
