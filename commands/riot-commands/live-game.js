@@ -31,7 +31,7 @@ export async function execute(interaction) {
     let username = interaction.options.getString('username');
     let tagline = interaction.options.getString('tagline');
     let region = interaction.options.getString('region');
-    let targetUser = interaction.options.getUser('target')
+    let targetUser = interaction.options.getUser('target');
 
     if (targetUser) { // First checks if another Discord user is given to look up
         discordUserId = targetUser.id;
