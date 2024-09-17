@@ -28,6 +28,20 @@ export async function execute(interaction) {
     let tagline = interaction.options.getString('tagline');
     let region = interaction.options.getString('region');
     const count = interaction.options.getInteger('count');
+    let targetUser = interaction.options.getUser('target');
+
+    if (targetUser) { // First checks if another Discord user is given to look up
+        const targetProfile = await getProfile(targetUser.id);
+        console.log(targetUser.id);
+        if (targetProfile) {
+            username = username || targetProfile.riot_username;
+            tagline = tagline || targetProfile.tagline;
+            region = region || targetProfile.region;
+        } else {
+            await interaction.editReply({ content: `The user <@${targetUser.id}> does not have a linked Riot account. Please ensure they have set up their profile with /setprofile.`, ephemeral: true });
+            return;
+        }
+    }
 
     // Fetch user profile if no name is provided
     if (!username || !tagline || !region) {
