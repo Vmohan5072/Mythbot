@@ -1,4 +1,3 @@
-// TODO: allow users to ping others to pull their riot info, adjust readme, refactoring codebase
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { normalizeRegionInput } from '../../utils.js';
 import { getPuuidByRiotId, getLiveGameDataBySummonerId, getRankBySummID, getMasteryListByPUUID, getChampionIdToNameMap, getQueueDescription } from '../../API/riot-api.js';
