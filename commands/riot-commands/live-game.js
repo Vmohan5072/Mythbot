@@ -1,4 +1,4 @@
-// TODO: Rework region input handling, allow users to ping others to pull their riot info, adjust readme, refactoring codebase
+// TODO: allow users to ping others to pull their riot info, adjust readme, refactoring codebase
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { normalizeRegionInput } from '../../utils.js';
 import { getPuuidByRiotId, getLiveGameDataBySummonerId, getRankBySummID, getMasteryListByPUUID, getChampionIdToNameMap, getQueueDescription } from '../../API/riot-api.js';
@@ -18,6 +18,10 @@ export const data = new SlashCommandBuilder()
     .addStringOption(option =>
         option.setName('region')
             .setDescription('The region of the Riot account (na1, euw1, eune1, etc.)')
+            .setRequired(false))
+    .addUserOption(option =>
+        option.setName('target')
+            .setDescription('The Discord user to look up.')
             .setRequired(false));
 
 export async function execute(interaction) {
@@ -27,9 +31,24 @@ export async function execute(interaction) {
     let username = interaction.options.getString('username');
     let tagline = interaction.options.getString('tagline');
     let region = interaction.options.getString('region');
+    let targetUser = interaction.options.getUser('target')
 
-    // Fetch user profile from the database if the username/tagline/region are not provided
-    if (!username || !tagline || !normalizedRegion) {
+    if (targetUser) { // First checks if another Discord user is given to look up
+        discordUserId = targetUser.id;
+        const targetProfile = await getProfile(discordUserId);
+    
+        if (targetProfile) {
+            username = username || targetProfile.riot_username;
+            tagline = tagline || targetProfile.tagline;
+            region = region || targetProfile.region;
+        } else {
+            await interaction.editReply({ content: `The user <@${targetUser.id}> does not have a linked Riot account. Please ensure they have set up their profile with /setprofile.`, ephemeral: true });
+            return;
+        }
+    }
+
+    // If no provided discord id nor any account information, fetch account info from database
+    else if (!username || !tagline || !normalizedRegion) {
         const userProfile = await getProfile(interaction.user.id);
         if (userProfile) {
             username = username || userProfile.riot_username;
