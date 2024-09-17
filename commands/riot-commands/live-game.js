@@ -34,11 +34,8 @@ export async function execute(interaction) {
     let targetUser = interaction.options.getUser('target');
 
     if (targetUser) { // First checks if another Discord user is given to look up
-        console.log(`${targetUser}`); //debugging print statement
-        discordUserId = targetUser.user.id;
-        console.log(`${targetUser} + ${discordUserId}`); //debugging print statement
-        const targetProfile = await getProfile(discordUserId);
-    
+        const targetProfile = await getProfile(targetUser);
+
         if (targetProfile) {
             username = username || targetProfile.riot_username;
             tagline = tagline || targetProfile.tagline;
