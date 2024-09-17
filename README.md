@@ -4,7 +4,7 @@ MythBot is a Discord bot designed with the Discord.js framework to enhance the L
 
 ## Features
 
-- **Custom Lobby Creation**: Users can create custom lobbies within Discord, allowing other users to join and leave with a simple click of a button.
+- **Custom Lobby Creation**: Users can create custom lobbies within Discord, allowing other users to join and leave with a simple click of a button, with the option to automatically balance teams based on rank and total matches played.
 - **Team Balancing**: The bot balances teams within the lobby based on player ranks and divisions to ensure fair matches.
 - **Profile Fetching**: Retrieve detailed League of Legends profile information, including rank, win rate, and mastery, directly from Discord.
 - **Live Game Data**: During a League of Legends match, the bot can gather information of each player in your match, such as the ranks, current champion mastery, and a linked op.gg profile.
@@ -47,22 +47,6 @@ Before you begin, ensure you have met the following requirements:
     npm start
     ```
 
-## Commands and Interactions
-
-### `/createlobby`
-
-- **Description**: Creates a custom lobby where users can join, leave, and balance teams.
-- **Options**:
-  - `maxplayers` (optional): Set the maximum number of players (default is 10).
-- **Usage**: 
-    - Creates a lobby with interactive buttons for users to join, leave, and balance teams.
-    - Example: `/createlobby maxplayers:10`
-
-### Fetching User Profiles
-
-- The bot uses a `getProfile` function to fetch linked Riot account information.
-- This data is then used for various commands, such as balancing teams based on ranks and win rates.
-
 ## File Structure
 
 - **app.js**: The main entry point for the bot, handling command registration and interactions.
@@ -78,9 +62,5 @@ Before you begin, ensure you have met the following requirements:
 
 ## API Call Rate Limiting
 
-- **Rate Limits**: The bot properly paces API calls to the Riot Games API to avoid hitting rate limits.
-- **Error Handling**: The bot handles 429 rate limit errors by retrying the request after the recommended delay.
-
-## Coming Soon
-
-- **Server Leaderboard**: A leaderboard in a server that displays the Discord users with the highest ranks, as well as the top champion masteries.
+- **Rate Limits**: The bot properly paces API calls to the Riot Games API to avoid hitting personal API rate limits.
+- **Error Handling**: The bot handles 429 rate limit errors by automatically retrying the request after a delay.
