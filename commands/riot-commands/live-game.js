@@ -35,6 +35,7 @@ export async function execute(interaction) {
 
     if (targetUser) { // First checks if another Discord user is given to look up
         discordUserId = targetUser.user.id;
+        console.log(`${targetUser} + ${discordUserId}`); //debugging print statement
         const targetProfile = await getProfile(discordUserId);
     
         if (targetProfile) {
@@ -54,7 +55,9 @@ export async function execute(interaction) {
             username = username || userProfile.riot_username;
             tagline = tagline || userProfile.tagline;
             region = region || userProfile.region;
-        } else {
+        } 
+        
+        else {
             await interaction.editReply({ content: 'Please provide your Riot ID details or set up your profile with /setprofile.', ephemeral: true });
             return;
         }
