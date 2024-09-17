@@ -47,7 +47,7 @@ export async function execute(interaction) {
     }
 
     // If no provided discord id nor any account information, fetch account info from database
-    else if (!username || !tagline || !normalizedRegion) {
+    else if (!username || !tagline || !region) { 
         const userProfile = await getProfile(interaction.user.id);
         if (userProfile) {
             username = username || userProfile.riot_username;
@@ -59,6 +59,16 @@ export async function execute(interaction) {
             await interaction.editReply({ content: 'Please provide your Riot ID details or set up your profile with /setprofile.', ephemeral: true });
             return;
         }
+    }
+
+    let normalizedRegion;
+    try {
+        normalizedRegion = normalizeRegionInput(region);
+    } 
+    
+    catch (error) {
+        await interaction.editReply({ content: `Invalid region provided: ${region}. Please use a valid region code (e.g., na1, euw1, eune1).`, ephemeral: true });
+        return;
     }
 
     console.log(`Fetching live game data for username: ${username}, tagline: ${tagline}, region: ${normalizedRegion}`);
@@ -77,7 +87,6 @@ export async function execute(interaction) {
     };
 
     try {
-        let normalizedRegion = normalizeRegionInput(region);
         const puuid = await getPuuidByRiotId(username, tagline, normalizedRegion);
 
         if (!puuid) {
@@ -92,8 +101,8 @@ export async function execute(interaction) {
             return;
         }
 
-         // grab queue from queueId
-         const queueDescription = await getQueueDescription(liveGameData.gameQueueConfigId);
+        // grab queue from queueId
+        const queueDescription = await getQueueDescription(liveGameData.gameQueueConfigId);
 
 
         // Get the champion ID to name map from Data Dragon API
@@ -131,7 +140,7 @@ export async function execute(interaction) {
             const masteryData = await getMasteryListByPUUID(participant.puuid, normalizedRegion);
             const champMastery = masteryData.find(mastery => mastery.championId === participant.championId)?.championPoints || 'N/A';
             const soloRank = rankData.solo ? `${rankData.solo.tier} ${rankData.solo.rank}` : 'Unranked';
-            const opGGUrl = constructOpGGUrl(region, participant.riotId);
+            const opGGUrl = constructOpGGUrl(normalizedRegion, participant.riotId);
 
             leftColumn += `**[${participant.riotId}](${opGGUrl})**\nSolo/Duo Rank: ${soloRank}\nChampion: ${championName}\nMastery Points: ${champMastery}\n\n`;
         }
@@ -143,7 +152,7 @@ export async function execute(interaction) {
             const masteryData = await getMasteryListByPUUID(participant.puuid, normalizedRegion);
             const champMastery = masteryData.find(mastery => mastery.championId === participant.championId)?.championPoints || 'N/A';
             const soloRank = rankData.solo ? `${rankData.solo.tier} ${rankData.solo.rank}` : 'Unranked';
-            const opGGUrl = constructOpGGUrl(region, participant.riotId);
+            const opGGUrl = constructOpGGUrl(normalizedRegion, participant.riotId);
 
             rightColumn += `**[${participant.riotId}](${opGGUrl})**\nSolo/Duo Rank: ${soloRank}\nChampion: ${championName}\nMastery Points: ${champMastery}\n\n`;
         }
