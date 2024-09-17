@@ -2,7 +2,7 @@
 
 MythBot is a Discord bot designed with the Discord.js framework to enhance the League of Legends experience by enabling users to create custom lobbies, balance teams based on player ranks, and fetch League of Legends profile information. The bot uses the Riot Games API to provide accurate and up-to-date information about players' ranks, win rates, and other stats.
 
-Add MythBot to your server [here]([https://pages.github.com/](https://discord.com/oauth2/authorize?client_id=1055606532718481558).
+Add MythBot to your server [here!](https://discord.com/oauth2/authorize?client_id=1055606532718481558)
 
 ## Features
 
