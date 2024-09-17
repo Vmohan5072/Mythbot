@@ -34,7 +34,7 @@ export async function execute(interaction) {
     let targetUser = interaction.options.getUser('target');
 
     if (targetUser) { // First checks if another Discord user is given to look up
-        discordUserId = targetUser.id;
+        discordUserId = targetUser.user.id;
         const targetProfile = await getProfile(discordUserId);
     
         if (targetProfile) {
