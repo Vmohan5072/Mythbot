@@ -21,6 +21,10 @@ export const data = new SlashCommandBuilder()
     .addIntegerOption(option =>
         option.setName('count')
             .setDescription('The top # of champions to display (Optional)')
+            .setRequired(false))
+    .addUserOption(option =>
+        option.setName('target')
+            .setDescription('The Discord user to look up.')
             .setRequired(false));
 
 export async function execute(interaction) {

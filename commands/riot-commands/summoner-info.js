@@ -17,6 +17,10 @@ export const data = new SlashCommandBuilder()
     .addStringOption(option =>
         option.setName('region')
             .setDescription('The region of the Riot account (na1, euw1, eune1, etc.)')
+            .setRequired(false))
+    .addUserOption(option =>
+        option.setName('target')
+            .setDescription('The Discord user to look up.')
             .setRequired(false));
 
 export async function execute(interaction) {
