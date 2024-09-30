@@ -42,6 +42,7 @@ try {
 client.once(Events.ClientReady, readyClient => {
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
     registerButtonHandler(client);
+    client.user.setStatus('idle');
 });
 
 console.log("Logging in...");  // More console logging
